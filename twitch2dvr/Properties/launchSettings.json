@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "twitch2dvr": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
