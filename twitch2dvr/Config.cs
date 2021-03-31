@@ -9,7 +9,7 @@ namespace twitch2dvr
     {
         public static string Address => $"http://+:{Port}";
 
-        public static string Port => Environment.GetEnvironmentVariable("PORT");
+        public static string Port => "22708";
 
         public static string ClientId => Environment.GetEnvironmentVariable("CLIENT_ID");
 
