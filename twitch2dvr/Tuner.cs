@@ -93,7 +93,7 @@ namespace twitch2dvr
                     Channel = channel.DisplayName,
                     Start = (channel.LiveStreamStartedDateTime ?? DateTime.Now.Subtract(TimeSpan.FromHours(1))).ToString("yyyyMMddHHmmss zzz"),
                     Stop = DateTime.Now.Add(TimeSpan.FromHours(24)).ToString("yyyyMMddHHmmss zzz"),
-                    Title = $"{channel.DisplayName} Playing {channel.LiveGameName ?? "Offline"}",
+                    Title = $"{(channel.IsLive ? $"{(char)8226} " : string.Empty)}{channel.DisplayName} Playing {channel.LiveGameName ?? "Offline"}", // https://bytetool.web.app/en/ascii/code/0x95/
                     Icon = new Icon { Source = channel.LiveGameArtUrl }
                 });
             }
