@@ -60,7 +60,7 @@ namespace twitch2dvr
 
             List<HDHomeRunLineupItem> lineupItems = new List<HDHomeRunLineupItem>();
 
-            foreach (Channel channel in await ChannelManager.UpdateChannels(UpdateChannelMode.None))
+            foreach (Channel channel in await ChannelManager.UpdateChannels(UpdateChannelMode.Retrieve))
             {
                 lineupItems.Add(new HDHomeRunLineupItem
                 {

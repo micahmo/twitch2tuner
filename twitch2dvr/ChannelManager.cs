@@ -81,13 +81,24 @@ namespace twitch2dvr
                 Environment.Exit(1);
             }
 
-            // Get the list of channels/users that the user follows
-            Follow[] userFollows = (await TwitchApi.Helix.Users.GetUsersFollowsAsync(fromId: twitchUser.Id)).Follows;
+            string page = string.Empty;
+            List<Follow> userFollows = new List<Follow>();
+
+            // Get the users that the user follows. Have to use pagination with this call.
+            do
+            {
+                GetUsersFollowsResponse response = (await TwitchApi.Helix.Users.GetUsersFollowsAsync(fromId: twitchUser.Id, after: page));
+                userFollows.AddRange(response.Follows);
+                page = response.Pagination.Cursor;
+            } while (string.IsNullOrEmpty(page) == false);
+            
+
+            $"Found that user {twitchUser.DisplayName} follows {userFollows.Count} channels: {string.Join(", ", userFollows.Select(x => x.ToUserName))}".Log(nameof(RetrieveChannels), LogLevel.Info);
 
             // Translate those follows into users
             User[] followedUsers = (await TwitchApi.Helix.Users.GetUsersAsync(ids: userFollows.Select(x => x.ToUserId).ToList())).Users;
 
-            $"Found these followed channels: {string.Join(", ", followedUsers.Select(u => u.DisplayName).ToArray())}".Log(nameof(UpdateChannels), LogLevel.Info);
+            $"Translated {userFollows.Count} follows into {followedUsers.Length} users: {string.Join(", ", followedUsers.Select(u => u.DisplayName).ToArray())}".Log(nameof(RetrieveChannels), LogLevel.Info);
 
             // Translate those users into Channels
             foreach (User followedUser in followedUsers)
@@ -98,8 +109,6 @@ namespace twitch2dvr
                     ChannelNumber = followedUser.Id,
                     ProfileImageUrl = followedUser.ProfileImageUrl
                 };
-
-
 
                 channels.Add(channel);
             }
