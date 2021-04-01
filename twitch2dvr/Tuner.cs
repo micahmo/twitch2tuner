@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using EmbedIO;
+using Swan.Logging;
 using twitch2dvr.EPG;
 
 namespace twitch2dvr
@@ -138,8 +138,21 @@ namespace twitch2dvr
                     context.Response.Headers["Expires"] = "0";
                     await context.Response.OutputStream.FlushAsync();
 
-                    await stream.CopyToAsync(context.Response.OutputStream, 4096);
-                    await context.Response.OutputStream.FlushAsync();
+                    $"Starting stream of channel {channel.DisplayName}".Log(nameof(GetStream), LogLevel.Info);
+
+                    try
+                    {
+                        await stream.CopyToAsync(context.Response.OutputStream, 4096);
+                    }
+                    catch
+                    {
+                        // Stream until there is an exception, which will occur when the client disconnects.
+                        // Then we can kill the youtube-dl process
+                        youtubeDlProcess.Kill();
+                        await youtubeDlProcess.WaitForExitAsync();
+
+                        $"Client disconnected. Killing stream of channel {channel.DisplayName}. youtube-dl exited successfully is {youtubeDlProcess.HasExited}.".Log(nameof(GetStream), LogLevel.Info);
+                    }
                 }
             }
         }

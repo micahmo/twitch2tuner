@@ -35,7 +35,7 @@ namespace twitch2dvr
         {
             $"Starting server on {Config.Address}".Log(nameof(StartServer), LogLevel.Info);
 
-            new WebServer(o => o
+            WebServer webServer = new WebServer(o => o
                     .WithUrlPrefix(Config.Address)
                     .WithMode(HttpListenerMode.EmbedIO))
                 .WithLocalSessionManager()
@@ -44,8 +44,14 @@ namespace twitch2dvr
                 .WithModule(new ActionModule("/lineup.json", HttpVerbs.Any, Tuner.Lineup))
                 .WithModule(new ActionModule("/lineup.post", HttpVerbs.Any, Tuner.Lineup))
                 .WithModule(new ActionModule("/epg.xml", HttpVerbs.Any, Tuner.Epg))
-                .WithModule(new ActionModule("/getStream", HttpVerbs.Any, Tuner.GetStream))
-                .RunAsync();
+                .WithModule(new ActionModule("/getStream", HttpVerbs.Any, Tuner.GetStream));
+
+            // Important: Do not ignore write exceptions, but let them bubble up.
+            // This allows us to see when a client disconnects, so that we can stop streaming.
+            // (Otherwise we could stream to a disconnected client indefinitely.)
+            webServer.Listener.IgnoreWriteExceptions = false;
+
+            webServer.RunAsync();
 
             "Server is started and ready to receive connections.".Log(nameof(StartServer), LogLevel.Info);
         }
