@@ -28,9 +28,12 @@ namespace twitch2dvr
         public string LiveGameName { get; set; }
 
         /// <summary>
-        /// If live, the artwork of the game being played on the channel (null if not live)
+        /// If live, the artwork of the game being played on the channel.
         /// </summary>
-        public string LiveGameArtUrl { get; set; }
+        /// <remarks>
+        /// By default, use Twitch's 404 offline box art. This will look nicer for a channel that is offline than Plex's default poster.
+        /// </remarks>
+        public string LiveGameArtUrl { get; set; } = "https://static-cdn.jtvnw.net/ttv-static/404_boxart.jpg";
 
         /// <summary>
         /// If live, the date/time at which the stream started (null if not live)
