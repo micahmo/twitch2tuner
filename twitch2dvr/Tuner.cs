@@ -113,6 +113,11 @@ namespace twitch2dvr
 
             if ((await ChannelManager.UpdateChannels(UpdateChannelMode.None)).FirstOrDefault(c => c.ChannelNumber == id) is { } channel)
             {
+                // Make sure we have the latest stream info for the channel.
+                // This is especially important if the guide is out of date.
+                // It allows watching a streamer who is really live, even if the guide says they are offline.
+                await ChannelManager.UpdateLiveStatus(channel);
+
                 if (channel.IsLive)
                 {
                     Process youtubeDlProcess = Process.Start(new ProcessStartInfo
