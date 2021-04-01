@@ -38,24 +38,34 @@ namespace twitch2dvr
                 // Now update the status
                 foreach (Channel channel in _channels)
                 {
-                    // See if the followed user is streaming
-                    Stream stream = (await _twitchApi.Helix.Streams.GetStreamsAsync(userIds: new List<string> {channel.ChannelNumber})).Streams.FirstOrDefault();
-
-                    channel.IsLive = stream is { };
-                    channel.UserName = stream?.UserName;
-                    channel.LiveGameName = stream?.GameName;
-                    channel.LiveStreamStartedDateTime = stream?.StartedAt;
-
-                    // If the user is streaming, get the game art
-                    if (stream is { })
-                    {
-                        var game = (await _twitchApi.Helix.Games.GetGamesAsync(new List<string> {stream.GameId})).Games.FirstOrDefault();
-                        channel.LiveGameArtUrl = game?.BoxArtUrl.Replace("{width}", "272").Replace("{height}", "380");
-                    }
+                    await UpdateLiveStatus(channel);
                 }
             }
 
             return _channels;
+        }
+
+        /// <summary>
+        /// Updates the live status (whether the streamer is live and other related data) for the given <paramref name="channel"/>.
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public static async Task UpdateLiveStatus(Channel channel)
+        {
+            // See if the user is streaming
+            Stream stream = (await TwitchApi.Helix.Streams.GetStreamsAsync(userIds: new List<string> {channel.ChannelNumber})).Streams.FirstOrDefault();
+
+            channel.IsLive = stream is { };
+            channel.UserName = stream?.UserName;
+            channel.LiveGameName = stream?.GameName;
+            channel.LiveStreamStartedDateTime = stream?.StartedAt;
+
+            // If the user is streaming, get the game art
+            if (stream is { })
+            {
+                var game = (await TwitchApi.Helix.Games.GetGamesAsync(new List<string> {stream.GameId})).Games.FirstOrDefault();
+                channel.LiveGameArtUrl = game?.BoxArtUrl.Replace("{width}", "272").Replace("{height}", "380");
+            }
         }
 
         private static async Task<List<Channel>> RetrieveChannels()
@@ -63,7 +73,7 @@ namespace twitch2dvr
             List<Channel> channels = new List<Channel>();
 
             // Get the Twitch user
-            User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> { Config.TwitchUsername })).Users.FirstOrDefault();
+            User twitchUser = (await TwitchApi.Helix.Users.GetUsersAsync(logins: new List<string> { Config.TwitchUsername })).Users.FirstOrDefault();
 
             if (twitchUser is null)
             {
@@ -72,10 +82,10 @@ namespace twitch2dvr
             }
 
             // Get the list of channels/users that the user follows
-            Follow[] userFollows = (await _twitchApi.Helix.Users.GetUsersFollowsAsync(fromId: twitchUser.Id)).Follows;
+            Follow[] userFollows = (await TwitchApi.Helix.Users.GetUsersFollowsAsync(fromId: twitchUser.Id)).Follows;
 
             // Translate those follows into users
-            User[] followedUsers = (await _twitchApi.Helix.Users.GetUsersAsync(ids: userFollows.Select(x => x.ToUserId).ToList())).Users;
+            User[] followedUsers = (await TwitchApi.Helix.Users.GetUsersAsync(ids: userFollows.Select(x => x.ToUserId).ToList())).Users;
 
             $"Found these followed channels: {string.Join(", ", followedUsers.Select(u => u.DisplayName).ToArray())}".Log(nameof(UpdateChannels), LogLevel.Info);
 
@@ -99,7 +109,7 @@ namespace twitch2dvr
 
         private static List<Channel> _channels = new List<Channel>();
 
-        private static TwitchAPI _twitchApi { get; } = new TwitchAPI(settings: new ApiSettings
+        private static readonly TwitchAPI TwitchApi = new TwitchAPI(settings: new ApiSettings
         {
             ClientId = Config.ClientId,
             AccessToken = Config.AccessToken
