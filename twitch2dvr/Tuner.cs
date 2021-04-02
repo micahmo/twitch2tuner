@@ -124,10 +124,41 @@ namespace twitch2dvr
 
                 if (channel.IsLive)
                 {
+                    string streamUrl;
+
+                    $"Searching for stream URL for streamer twitch.tv/{channel.UserName}".Log(nameof(GetStream), LogLevel.Info);
+
+                    if (StreamUrlMap.TryGetValue(channel.LiveStreamId, out string cachedStreamUrl))
+                    {
+                        streamUrl = cachedStreamUrl;
+                        $"Found cached stream URL for streamer {channel.DisplayName} with stream starting at {channel.LiveStreamStartedDateTime} and stream ID {channel.LiveStreamId}."
+                            .Log(nameof(GetStream), LogLevel.Info);
+                    }
+                    else
+                    {
+                        Process getStreamUrlProcess = Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "youtube-dl",
+                            Arguments = $"-q --no-warnings twitch.tv/{channel.UserName} --get-url",
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true,
+                            CreateNoWindow = true
+                        });
+
+                        // Save this URL for this streamer/stream start time
+                        streamUrl = StreamUrlMap[channel.LiveStreamId] = getStreamUrlProcess.StandardOutput.ReadToEnd();
+
+                        ($"Did not find cached stream URL for streamer {channel.DisplayName} with stream starting at {channel.LiveStreamStartedDateTime} and stream ID {channel.LiveStreamId}. " +
+                         $"Found new URL: {streamUrl}")
+                            .Log(nameof(GetStream), LogLevel.Info);
+                    }
+
+                    // Now that we have the URL, we can stream it
+
                     Process youtubeDlProcess = Process.Start(new ProcessStartInfo
                     {
                         FileName = "youtube-dl",
-                        Arguments = $"-q --no-warnings twitch.tv/{channel.UserName} -o -",
+                        Arguments = $"-q --no-warnings {streamUrl} -o -",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         CreateNoWindow = true
@@ -160,5 +191,8 @@ namespace twitch2dvr
                 }
             }
         }
+
+        // Maps stream ID to stream URL to allow reusing URLs for the same stream
+        private static readonly Dictionary<string, string> StreamUrlMap = new Dictionary<string, string>();
     }
 }

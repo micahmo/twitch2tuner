@@ -23,6 +23,11 @@ namespace twitch2dvr
         public bool IsLive { get; set; }
 
         /// <summary>
+        /// A unique identifier for the current stream
+        /// </summary>
+        public string LiveStreamId { get; set; }
+
+        /// <summary>
         /// If live, the name of the game being played on the channel (null if not live)
         /// </summary>
         public string LiveGameName { get; set; }
