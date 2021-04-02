@@ -88,12 +88,16 @@ namespace twitch2dvr
                     Icon = new Icon {Source = channel.ProfileImageUrl}
                 });
 
+                string liveTitle = $"{(char)8226} {{0}} Playing {{1}}"; // 8226 is https://bytetool.web.app/en/ascii/code/0x95/
+                string offlineTitle = "{0} Offline";
+
                 tv.Programmes.Add(new Programme
                 {
                     Channel = channel.DisplayName,
                     Start = (channel.LiveStreamStartedDateTime ?? DateTime.Now.Subtract(TimeSpan.FromHours(1))).ToString("yyyyMMddHHmmss zzz"),
                     Stop = DateTime.Now.Add(TimeSpan.FromHours(24)).ToString("yyyyMMddHHmmss zzz"),
-                    Title = $"{(channel.IsLive ? $"{(char)8226} " : string.Empty)}{channel.DisplayName} Playing {channel.LiveGameName ?? "Offline"}", // https://bytetool.web.app/en/ascii/code/0x95/
+                    Title = string.Format(channel.IsLive ? liveTitle : offlineTitle, channel.DisplayName, channel.LiveGameName),
+                    Description = channel.LiveStreamTitle,
                     Icon = new Icon { Source = channel.LiveGameArtUrl }
                 });
             }

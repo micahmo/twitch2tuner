@@ -58,6 +58,7 @@ namespace twitch2dvr
             channel.IsLive = stream is { };
             channel.UserName = stream?.UserName;
             channel.LiveGameName = stream?.GameName;
+            channel.LiveStreamTitle = stream?.Title;
             channel.LiveStreamStartedDateTime = stream?.StartedAt;
 
             // If the user is streaming, get the game art

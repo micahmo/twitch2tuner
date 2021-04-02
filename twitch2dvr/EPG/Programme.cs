@@ -19,6 +19,9 @@ namespace twitch2dvr.EPG
         [XmlElement(ElementName = "title")]
         public string Title { get; set; }
 
+        [XmlElement(ElementName = "desc")]
+        public string Description { get; set; }
+
         [XmlElement(ElementName = "icon")]
         public Icon Icon { get; set; }
     }

@@ -28,6 +28,11 @@ namespace twitch2dvr
         public string LiveGameName { get; set; }
 
         /// <summary>
+        /// If live, the title of the stream
+        /// </summary>
+        public string LiveStreamTitle { get; set; }
+
+        /// <summary>
         /// If live, the artwork of the game being played on the channel.
         /// </summary>
         /// <remarks>
