@@ -56,7 +56,7 @@ namespace twitch2dvr
             Stream stream = (await TwitchApi.Helix.Streams.GetStreamsAsync(userIds: new List<string> {channel.ChannelNumber})).Streams.FirstOrDefault();
 
             channel.IsLive = stream is { };
-            channel.UserName = stream?.UserName;
+            channel.UserName = stream?.UserLogin;
             channel.LiveGameName = stream?.GameName;
             channel.LiveStreamTitle = stream?.Title;
             channel.LiveStreamStartedDateTime = stream?.StartedAt;
