@@ -15,7 +15,7 @@ namespace twitch2dvr
             // This command should download on first start, and upgrade on subsequent starts of the image.
             var pipProcess = Process.Start(new ProcessStartInfo
             {
-                FileName = "pip",
+                FileName = "pip3",
                 Arguments = "install --upgrade youtube-dl streamlink",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,

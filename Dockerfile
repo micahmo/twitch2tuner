@@ -20,7 +20,7 @@ COPY --from=publish /app/publish .
 
 RUN apt-get update && apt-get install -y \
   # Install pip so that we can use pip to install youtube-dl and streamlink at runtime
-  python-pip \
+  python3-pip \
   # youtube-dl needs ffmpeg, but it can't be installed with pip
   ffmpeg \
   && rm -rf /var/lib/apt/lists/*
