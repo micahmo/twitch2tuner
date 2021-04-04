@@ -177,7 +177,12 @@ namespace twitch2dvr
 
                     try
                     {
-                        await stream.CopyToAsync(context.Response.OutputStream, 4096);
+                        await stream.CopyToAsync(context.Response.OutputStream);
+
+                        // If we get here without throwing an exception, it probably means that the stream ended.
+                        // It should also mean that youtube-dl exited on its own.
+                        $"Channel {channel.DisplayName} stream ended. Flushing output stream and returning. youtube-dl exited gracefully is {youtubeDlProcess.HasExited}".Log(nameof(GetStream), LogLevel.Info);
+                        await context.Response.OutputStream.FlushAsync();
                     }
                     catch
                     {
