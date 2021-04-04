@@ -122,6 +122,14 @@ namespace twitch2dvr
                 // It allows watching a streamer who is really live, even if the guide says they are offline.
                 await ChannelManager.UpdateLiveStatus(channel);
 
+                // Grab the stream utility right off the bat, on the off chance that the env var changes.
+                StreamUtility streamDiscoveryUtility = Config.StreamUtility;
+                $"Using {streamDiscoveryUtility.Name} for stream discovery.".Log(nameof(GetStream), LogLevel.Info);
+
+                // At this time, only youtube-dl (ffmpeg under the hood) can do the actual streaming for Plex.
+                StreamUtility streamPlayingUtility = YoutubeDl.Instance; // Instead of Config.StreamUtility
+                $"Using {streamPlayingUtility.Name} for stream playing.".Log(nameof(GetStream), LogLevel.Info);
+
                 if (channel.IsLive)
                 {
                     string streamUrl;
@@ -136,35 +144,15 @@ namespace twitch2dvr
                     }
                     else
                     {
-                        Process getStreamUrlProcess = Process.Start(new ProcessStartInfo
-                        {
-                            FileName = "youtube-dl",
-                            Arguments = $"-q --no-warnings twitch.tv/{channel.UserName} --get-url",
-                            UseShellExecute = false,
-                            RedirectStandardOutput = true,
-                            CreateNoWindow = true
-                        });
+                        // Get and save the URL for this streamer/stream start time
+                        streamUrl = StreamUrlMap[channel.LiveStreamId] = streamDiscoveryUtility.GetStreamUrl($"twitch.tv/{channel.UserName}");
 
-                        // Save this URL for this streamer/stream start time
-                        streamUrl = StreamUrlMap[channel.LiveStreamId] = getStreamUrlProcess.StandardOutput.ReadToEnd();
-
-                        ($"Did not find cached stream URL for streamer {channel.DisplayName} with stream starting at {channel.LiveStreamStartedDateTime} and stream ID {channel.LiveStreamId}. " +
+                        ($"No cached stream URL for streamer {channel.DisplayName} with stream starting at {channel.LiveStreamStartedDateTime} and stream ID {channel.LiveStreamId}. " +
                          $"Found new URL: {streamUrl}")
                             .Log(nameof(GetStream), LogLevel.Info);
                     }
 
                     // Now that we have the URL, we can stream it
-
-                    Process youtubeDlProcess = Process.Start(new ProcessStartInfo
-                    {
-                        FileName = "youtube-dl",
-                        Arguments = $"-q --no-warnings {streamUrl} -o -",
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        CreateNoWindow = true
-                    });
-
-                    Stream stream = youtubeDlProcess.StandardOutput.BaseStream;
 
                     context.Response.ContentType = "video/mp2t";
                     context.Response.SendChunked = true;
@@ -175,23 +163,25 @@ namespace twitch2dvr
 
                     $"Starting stream of channel {channel.DisplayName}".Log(nameof(GetStream), LogLevel.Info);
 
+                    Process streamProcess = streamPlayingUtility.StartStreamProcess(streamUrl);
+
                     try
                     {
-                        await stream.CopyToAsync(context.Response.OutputStream);
+                        await streamProcess.StandardOutput.BaseStream.CopyToAsync(context.Response.OutputStream);
 
                         // If we get here without throwing an exception, it probably means that the stream ended.
-                        // It should also mean that youtube-dl exited on its own.
-                        $"Channel {channel.DisplayName} stream ended. Flushing output stream and returning. youtube-dl exited gracefully is {youtubeDlProcess.HasExited}".Log(nameof(GetStream), LogLevel.Info);
+                        // It should also mean that the stream process exited on its own.
+                        $"Channel {channel.DisplayName} stream ended. Flushing output stream and returning. Stream process {streamDiscoveryUtility.Name} exited gracefully is {streamProcess.HasExited}".Log(nameof(GetStream), LogLevel.Info);
                         await context.Response.OutputStream.FlushAsync();
                     }
                     catch
                     {
                         // Stream until there is an exception, which will occur when the client disconnects.
-                        // Then we can kill the youtube-dl process
-                        youtubeDlProcess.Kill();
-                        await youtubeDlProcess.WaitForExitAsync();
+                        // Then we can kill the stream process process
+                        streamProcess.Kill();
+                        await streamProcess.WaitForExitAsync();
 
-                        $"Client disconnected. Killing stream of channel {channel.DisplayName}. youtube-dl exited successfully is {youtubeDlProcess.HasExited}.".Log(nameof(GetStream), LogLevel.Info);
+                        $"Client disconnected. Killing stream of channel {channel.DisplayName}. Stream process {streamDiscoveryUtility.Name} exited successfully is {streamProcess.HasExited}.".Log(nameof(GetStream), LogLevel.Info);
                     }
                 }
             }

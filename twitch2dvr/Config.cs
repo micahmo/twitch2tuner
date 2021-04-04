@@ -16,5 +16,11 @@ namespace twitch2dvr
         public static string AccessToken => Environment.GetEnvironmentVariable("ACCESS_TOKEN");
 
         public static string TwitchUsername => Environment.GetEnvironmentVariable("TWITCH_USERNAME");
+
+        public static StreamUtility StreamUtility => Environment.GetEnvironmentVariable("STREAM_UTILITY") switch
+        {
+            "STREAMLINK" => Streamlink.Instance,
+            _ => YoutubeDl.Instance
+        };
     }
 }
