@@ -170,8 +170,26 @@ namespace twitch2dvr
                         await streamProcess.StandardOutput.BaseStream.CopyToAsync(context.Response.OutputStream);
 
                         // If we get here without throwing an exception, it probably means that the stream ended.
-                        // It should also mean that the stream process exited on its own.
-                        $"Channel {channel.DisplayName} stream ended. Flushing output stream and returning. Stream process {streamDiscoveryUtility.Name} exited gracefully is {streamProcess.HasExited}".Log(nameof(GetStream), LogLevel.Info);
+                        $"Channel {channel.DisplayName} stream ended.".Log(nameof(GetStream), LogLevel.Info);
+
+                        // First, remove the stream id from the cache.
+                        StreamUrlMap.Remove(channel.LiveStreamId);
+
+                        // Next, wait for the stream playing process to end (with a timeout, in case it hangs)
+                        if (streamProcess.WaitForExit((int)TimeSpan.FromSeconds(5).TotalMilliseconds))
+                        {
+                            $"Stream process {streamPlayingUtility.Name} exited gracefully is {streamProcess.HasExited}.".Log(nameof(GetStream), LogLevel.Info);
+                        }
+                        else
+                        {
+                            // The streaming process failed to exit gracefully, so kill it.
+                            streamProcess.Kill();
+                            await streamProcess.WaitForExitAsync();
+
+                            $"Stream process {streamPlayingUtility.Name} exited successfully (ungracefully) is {streamProcess.HasExited}.".Log(nameof(GetStream), LogLevel.Info);
+                        }
+
+                        "Flushing output stream and returning.".Log(nameof(GetStream), LogLevel.Info);
                         await context.Response.OutputStream.FlushAsync();
                     }
                     catch
@@ -181,7 +199,7 @@ namespace twitch2dvr
                         streamProcess.Kill();
                         await streamProcess.WaitForExitAsync();
 
-                        $"Client disconnected. Killing stream of channel {channel.DisplayName}. Stream process {streamDiscoveryUtility.Name} exited successfully is {streamProcess.HasExited}.".Log(nameof(GetStream), LogLevel.Info);
+                        $"Client disconnected. Killing stream of channel {channel.DisplayName}. Stream process {streamPlayingUtility.Name} exited successfully is {streamProcess.HasExited}.".Log(nameof(GetStream), LogLevel.Info);
                     }
                 }
             }
