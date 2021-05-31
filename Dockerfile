@@ -5,14 +5,14 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["twitch2dvr/twitch2dvr.csproj", "twitch2dvr/"]
-RUN dotnet restore "twitch2dvr/twitch2dvr.csproj"
+COPY ["twitch2tuner/twitch2tuner.csproj", "twitch2tuner/"]
+RUN dotnet restore "twitch2tuner/twitch2tuner.csproj"
 COPY . .
-WORKDIR "/src/twitch2dvr"
-RUN dotnet build "twitch2dvr.csproj" -c Release -o /app/build
+WORKDIR "/src/twitch2tuner"
+RUN dotnet build "twitch2tuner.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "twitch2dvr.csproj" -c Release -o /app/publish
+RUN dotnet publish "twitch2tuner.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
@@ -25,4 +25,4 @@ RUN apt-get update && apt-get install -y \
   ffmpeg \
   && rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["dotnet", "twitch2dvr.dll"]
+ENTRYPOINT ["dotnet", "twitch2tuner.dll"]

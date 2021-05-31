@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using EmbedIO;
 using Swan.Logging;
-using twitch2dvr.EPG;
+using twitch2tuner.EPG;
 
-namespace twitch2dvr
+namespace twitch2tuner
 {
     /// <summary>
     /// This class defines the endpoints necessary to simulate an HDHomeRun tuner for Plex to call
@@ -30,7 +30,7 @@ namespace twitch2dvr
             await context.SendDataAsync(new
             {
                 FriendlyName = "Twitch Tuner",
-                Manufacturer = "twitch2dvr",
+                Manufacturer = "twitch2tuner",
                 ModelNumber = "HDTC-2US",
                 FirmwareName = "hdhomeruntc_atsc",
                 FirmwareVersion = "20150826",

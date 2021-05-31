@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "twitch2dvr": {
+    "twitch2tuner": {
       "commandName": "Project"
     },
     "Docker": {

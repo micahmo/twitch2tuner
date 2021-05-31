@@ -1,6 +1,6 @@
-# twitch2dvr
+# twitch2tuner
 
-Inspired by the likes of [locast2plex](https://github.com/tgorgdotcom/locast2plex) and [locast2dvr](https://github.com/wouterdebie/locast2dvr) and the fact that there is no officially supported way to watch Twitch on a Roku device, twitch2dvr aims to present live Twitch streams as channels within Plex's [Live TV and DVR feature](https://support.plex.tv/articles/225877347-live-tv-dvr/).
+Inspired by the likes of [locast2plex](https://github.com/tgorgdotcom/locast2plex) and [locast2dvr](https://github.com/wouterdebie/locast2dvr) and the fact that there is no officially supported way to watch Twitch on a Roku device, twitch2tuner aims to present live Twitch streams as channels within Plex's [Live TV and DVR feature](https://support.plex.tv/articles/225877347-live-tv-dvr/).
 
 # Setup
 
@@ -23,14 +23,14 @@ https://www.google.com/#access_token=ACCESS_TOKEN&scope=user%3Aread%3Asubscripti
 
 ## Install
 
-Now that you have access to the Twitch API, you can install twitch2dvr. It is intended to be run in a Docker container.
+Now that you have access to the Twitch API, you can install twitch2tuner. It is intended to be run in a Docker container.
 You can use the following docker run command, filling in the `CLIENT_ID`, `ACCESS_TOKEN`, and `USERNAME` as needed.
 ```
-docker run -d --name=twitch2dvr -p 22708:22708 -e CLIENT_ID=... -e ACCESS_TOKEN=... -e USERNAME=... twitch2dvr
+docker run -d --name=twitch2tuner -p 22708:22708 -e CLIENT_ID=... -e ACCESS_TOKEN=... -e USERNAME=... twitch2tuner
 ```
 Alternatively, you can use the following Docker template to easily install the container in Unraid.
 
-https://github.com/micahmo/docker-templates/blob/master/micahmo/twitch2dvr.xml
+https://github.com/micahmo/docker-templates/blob/master/micahmo/twitch2tuner.xml
 
 ## Plex
 
@@ -42,7 +42,7 @@ If the server is not found automatically, click "Don't see your HDHomeRun device
 
 Once the device is found, click Next. It should detect a channel for each of your followed channels on Twitch. If not, click Scan Channels. Click Continue.
 
-Next it will prompt for a ZIP code to download an electronic guide. In this case, the guide is served by twitch2dvr, so click "Have an XMLTV guide on your server? Click here to use that instead." Then enter the address of the server, followed by `/epg.xml`, like `http://192.168.1.2:22708/epg.xml`. Click Continue.
+Next it will prompt for a ZIP code to download an electronic guide. In this case, the guide is served by twitch2tuner, so click "Have an XMLTV guide on your server? Click here to use that instead." Then enter the address of the server, followed by `/epg.xml`, like `http://192.168.1.2:22708/epg.xml`. Click Continue.
 
 Plex should load the Electronic Program Guide and match the listings to the channel lineup from the tuner. Click Continue.
 

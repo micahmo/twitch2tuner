@@ -9,7 +9,7 @@ using TwitchLib.Api.Helix.Models.Streams.GetStreams;
 using TwitchLib.Api.Helix.Models.Users.GetUserFollows;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
-namespace twitch2dvr
+namespace twitch2tuner
 {
     /// <summary>
     /// A class that can provide Twitch channel information

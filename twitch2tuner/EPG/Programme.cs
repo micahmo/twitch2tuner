@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace twitch2dvr.EPG
+namespace twitch2tuner.EPG
 {
     /// <summary>
     /// Represents a programme entry in an XMLTV EPG

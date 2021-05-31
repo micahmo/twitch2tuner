@@ -1,4 +1,4 @@
-﻿namespace twitch2dvr
+﻿namespace twitch2tuner
 {
     /// <summary>
     /// Defines a lineup item according to the HDHomeRun scheme

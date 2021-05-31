@@ -2,7 +2,7 @@
 using System.IO;
 using Swan.Logging;
 
-namespace twitch2dvr
+namespace twitch2tuner
 {
     public abstract class StreamUtility
     {

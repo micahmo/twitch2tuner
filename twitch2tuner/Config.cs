@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace twitch2dvr
+namespace twitch2tuner
 {
     /// <summary>
     /// Provides access to global configuration as defined by environment variables

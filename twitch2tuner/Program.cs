@@ -5,7 +5,7 @@ using EmbedIO;
 using EmbedIO.Actions;
 using Swan.Logging;
 
-namespace twitch2dvr
+namespace twitch2tuner
 {
     class Program
     {

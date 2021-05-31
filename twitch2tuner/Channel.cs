@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace twitch2dvr
+namespace twitch2tuner
 {
     /// <summary>
     /// Describes a Twitch channel

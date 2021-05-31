@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace twitch2dvr.EPG
+namespace twitch2tuner.EPG
 {
     /// <summary>
     /// Represents an icon for a XMLTV EPG channel or programme
