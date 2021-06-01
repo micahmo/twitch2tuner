@@ -42,9 +42,6 @@ You can use the following docker run command, filling in the `CLIENT_ID`, `ACCES
 ```
 docker run -d --name=twitch2tuner -p 22708:22708 -e CLIENT_ID=... -e ACCESS_TOKEN=... -e USERNAME=... twitch2tuner
 ```
-Alternatively, you can use the following Docker template to easily install the container in Unraid.
-
-https://github.com/micahmo/docker-templates/blob/master/micahmo/twitch2tuner.xml
 
 You can optionally pass a value for the `STREAM_UTILITY` environment variable. The accepted values are `YOUTBUE_DL` and `STREAMLINK` with any other value (or empty) defaulting to `STREAMLINK`. This determines the utility that is used to extract the stream URL from Twitch. This is configurable because occasionally the URLs from one utility or the other begin with an ad placeholder embedded at the beginning of the stream. (Fortunately, there is no ad, but it is annoying to wait for the placeholder to count down.) I've had more luck with the URLs obtained by Streamlink, which is why it is the default, but you can experiment to find the best for you.
 ```
@@ -52,6 +49,13 @@ You can optionally pass a value for the `STREAM_UTILITY` environment variable. T
 ```
 
 If you'd like to locally test the exact command that is run for a given utility, see the code [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L71) and [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L49).
+
+### Unraid
+
+To run the container on Unraid, you can use the Docker template from this repository.
+* In Unraid, navigate to the Docker tab. At the bottom, add `https://github.com/micahmo/twitch2tuner` on a new line to the list of template repositories. Save.
+* At the bottom, choose Add Container. From the template dropdown, choose `twitch2tuner`.
+* Fill out the rest of the options as desired.
 
 ## Plex
 
@@ -82,6 +86,10 @@ This is an imperfect solution, as Twitch is obviously not designed to be served 
 # Misc
 
 I've found that the guide often does not load correctly the first time on Roku devices. Pressing the back button once the guide is focused often fixes it. There is a Plex forum thread to track the issue [here](https://forums.plex.tv/t/bug-guide-is-blank-on-roku-until-pressing-back-button/707519).
+
+# Contributing
+
+While anyone is free to open new issues, be aware that there is a limit to the level of compatibility that this project will ever have, since it is essentially fitting a square peg in a round hole. In addition, much of the functionality is outside the control of this project (e.g., the Twitch API, Streamlink, youtube-dl, Plex, etc.). There is no guarantee that any particular issue or quirk can be addressed. That said, contributions are more than welcome where appropriate.
 
 # Credits
 
