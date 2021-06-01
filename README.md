@@ -1,6 +1,6 @@
 # twitch2tuner
 
-Inspired by the likes of [locast2plex](https://github.com/tgorgdotcom/locast2plex) and [locast2dvr](https://github.com/wouterdebie/locast2dvr) and the fact that there is no officially supported way to watch Twitch on a Roku device, twitch2tuner aims to present live Twitch streams as channels within Plex's [Live TV and DVR feature](https://support.plex.tv/articles/225877347-live-tv-dvr/).
+Inspired by the likes of [locast2plex](https://github.com/tgorgdotcom/locast2plex) and [locast2tuner](https://github.com/wouterdebie/locast2tuner) (formerly [locast2dvr](https://github.com/wouterdebie/locast2dvr)) and the fact that there is no officially supported way to watch Twitch on a Roku device, twitch2tuner aims to present live Twitch streams as channels within Plex's [Live TV and DVR feature](https://support.plex.tv/articles/225877347-live-tv-dvr/).
 
 # Setup
 
@@ -60,3 +60,15 @@ This is an imperfect solution, as Twitch is obviously not designed to be served 
 # Misc
 
 I've found that the guide often does not load correctly the first time on Roku devices. Pressing the back button once the guide is focused often fixes it.
+
+# Credits
+
+Thanks to the following projects which provided inspiration for this project.
+* [locast2plex](https://github.com/tgorgdotcom/locast2plex)
+* [locast2tuner](https://github.com/wouterdebie/locast2tuner)
+
+Special credit to [IPTVTuner](https://github.com/marklieberman/iptvtuner) as a guide for emulating an HDHomeRun tuner.
+
+Thanks to the following utilities which make it possible to stream from Twitch.
+* [youtube-dl](https://github.com/ytdl-org/youtube-dl)
+* [Streamlink](https://github.com/streamlink/streamlink)
