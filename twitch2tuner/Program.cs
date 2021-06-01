@@ -9,6 +9,7 @@ namespace twitch2tuner
 {
     class Program
     {
+
         static async Task Main()
         {
             // Use pip (see Dockerfile) to install the latest version of youtube-dl and streamlink every time we start.
