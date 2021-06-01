@@ -1,3 +1,5 @@
+![logo](https://raw.githubusercontent.com/micahmo/twitch2tuner/master/twitch2tuner-icon.png)
+
 # twitch2tuner
 
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/micahmo/twitch2tuner)](https://hub.docker.com/r/micahmo/twitch2tuner/builds)
@@ -92,3 +94,5 @@ Special credit to [IPTVTuner](https://github.com/marklieberman/iptvtuner) as a g
 Thanks to the following utilities which make it possible to stream from Twitch.
 * [youtube-dl](https://github.com/ytdl-org/youtube-dl)
 * [Streamlink](https://github.com/streamlink/streamlink)
+
+[Icon](https://www.flaticon.com/free-icon/twitch_3845873) made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com.
