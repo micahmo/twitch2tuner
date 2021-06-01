@@ -55,14 +55,15 @@ Plex should load the Electronic Program Guide and match the listings to the chan
 
 Finally, Plex should download the guide, and it should be ready to use!
 
-# Caveats
+# Caveats and Known Issues
 
 This is an imperfect solution, as Twitch is obviously not designed to be served in a traditional TV guide. Watch out for the following.
  - If the list of channels you follow on Twitch changes, you will have to "rescan" the tuner to discover new channels. In Plex, go to Settings > Live TV & DVR > where it says "X channels - X enabled" click the "enabled" part. This will bring up the list of channels from the tuner, where you can select Scan Channels to rescan.
  - Since traditional TV guides provide listings far in advance, Plex only updates the guide on a daily basis by default. Of course, Twitch streamers could go live at any time. You can decrease the interval between guide updates in Plex by going to Settings > Live TV & DVR > DVR Settings > and change Guide Refresh Interval to the desired amount. Unfortunately, it does not go any lower than 1 hour, so you may also want to refresh the guide manually. Press the three-dot menu next to Live TV & DVR, and choose Refresh Guide.
     - Note that if the guide has not updated, and a streamer who is currently live is shown as Offline, you may still select their channel and watch. Although the guide may be out of date, the latest info about the channel is retrieved whenever you attempt to watch.
- - Finally, despite the name, this project is very much untested with regards to Plex's DVR feature. As with any project that is piecing together things that were not intended to work together, YMMV!
+ - This project is very much untested with regards to Plex's DVR feature. As with any project that is piecing together things that were not intended to work together, YMMV!
     - While DVR has has not been thoroughly tested, one thing that does work nicely is pausing and/or rewinding live streams.
+ - While the ability to pause and rewind a live stream is nice, there is a small quirk where the stream will end immediately when the streamer goes offline even if you are not at the end. (In other words, it will not play till the end of the stream if you are watching behind live.) 
 
 # Misc
 
