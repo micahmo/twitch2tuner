@@ -1,6 +1,16 @@
 # twitch2tuner
 
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/micahmo/twitch2tuner)](https://hub.docker.com/r/micahmo/twitch2tuner/builds)
+[![Docker Pulls](https://img.shields.io/docker/pulls/micahmo/twitch2tuner)](https://hub.docker.com/r/micahmo/twitch2tuner)
+![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/micahmo/twitch2tuner/latest)
+
 Inspired by the likes of [locast2plex](https://github.com/tgorgdotcom/locast2plex) and [locast2tuner](https://github.com/wouterdebie/locast2tuner) (formerly [locast2dvr](https://github.com/wouterdebie/locast2dvr)) and the fact that there is no officially supported way to watch Twitch on a Roku device, twitch2tuner aims to present live Twitch streams as channels within Plex's [Live TV and DVR feature](https://support.plex.tv/articles/225877347-live-tv-dvr/).
+
+The service acts as an HDHomeRun (m3u) tuner and also proves an XMLTV Electronic Program Guide (EPG). Together, it allows Plex to show Twitch streams as guide listings and play them on any supported Plex client with limited recording functionality. The channel listings are based on the Twitch channels followed by a particular user (set your username as an environment variable when running the container). Since stream end times (and future stream start times) are unknown, the guide is very imprecise. Live streams are listed as starting at the correct time in the past but ending in 24 hours. Offline streams are always shown as being offline for 24 hours. Of course, this data will be updated as the guide updates. See the [caveats section](https://github.com/micahmo/twitch2tuner#caveats-and-known-issues) for more info about the limitations of the guide. Other features of the guide include the game art as the show art, the current stream description as the show description, and a dot plus the name of the game as the show title for quickly identifying live streams in the guide.
+
+![Guide Screenshot](https://user-images.githubusercontent.com/7417301/120251579-00b58380-c250-11eb-92dc-f06aca69cd40.png)
+
+![What's On Screenshot](https://user-images.githubusercontent.com/7417301/120251580-014e1a00-c250-11eb-8a6a-4639025f7c1b.png)
 
 # Setup
 
