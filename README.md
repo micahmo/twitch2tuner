@@ -21,6 +21,8 @@ After you navigate to the link, it will redirect you back to the previously conf
 https://www.google.com/#access_token=ACCESS_TOKEN&scope=user%3Aread%3Asubscriptions&token_type=bearer
 ```
 
+> Note: This token may eventually expire, which will require you to navigate to the oauth2 URL in order to obtain a new token. It is recommended to save the oauth2 URL with your `CLIENT_ID` and `REDIRECT_URL` for quick access in the future.
+
 ## Install
 
 Now that you have access to the Twitch API, you can install twitch2tuner. It is intended to be run in a Docker container.
