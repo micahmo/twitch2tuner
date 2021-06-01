@@ -79,7 +79,7 @@ This is an imperfect solution, as Twitch is obviously not designed to be served 
 
 # Misc
 
-I've found that the guide often does not load correctly the first time on Roku devices. Pressing the back button once the guide is focused often fixes it.
+I've found that the guide often does not load correctly the first time on Roku devices. Pressing the back button once the guide is focused often fixes it. There is a Plex forum thread to track the issue [here](https://forums.plex.tv/t/bug-guide-is-blank-on-roku-until-pressing-back-button/707519).
 
 # Credits
 
