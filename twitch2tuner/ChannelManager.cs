@@ -51,7 +51,7 @@ namespace twitch2tuner
         public static async Task UpdateLiveStatus(Channel channel)
         {
             // See if the user is streaming
-            Stream stream = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Streams.GetStreamsAsync(userIds: new List<string> {channel.ChannelNumber}))).Streams.FirstOrDefault();
+            Stream stream = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Streams.GetStreamsAsync(userIds: new List<string> {channel.ChannelNumber})))?.Streams.FirstOrDefault();
 
             channel.IsLive = stream is { };
             channel.LiveStreamId = stream?.Id;
@@ -63,7 +63,7 @@ namespace twitch2tuner
             // If the user is streaming, get the game art
             if (stream is { })
             {
-                var game = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Games.GetGamesAsync(new List<string> {stream.GameId}))).Games.FirstOrDefault();
+                var game = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Games.GetGamesAsync(new List<string> {stream.GameId})))?.Games.FirstOrDefault();
                 channel.LiveGameArtUrl = game?.BoxArtUrl.Replace("{width}", "272").Replace("{height}", "380");
             }
         }
@@ -73,12 +73,12 @@ namespace twitch2tuner
             List<Channel> channels = new List<Channel>();
 
             // Get the Twitch user
-            User twitchUser = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> { Config.TwitchUsername }))).Users.FirstOrDefault();
+            User twitchUser = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> { Config.TwitchUsername })))?.Users.FirstOrDefault();
 
             if (twitchUser is null)
             {
                 $"Unable to find Twitch user {Config.TwitchUsername}".Log(nameof(UpdateChannels), LogLevel.Error);
-                Environment.Exit(1);
+                return channels;
             }
 
             string page = string.Empty;
@@ -88,29 +88,35 @@ namespace twitch2tuner
             do
             {
                 GetUsersFollowsResponse response = await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersFollowsAsync(fromId: twitchUser.Id, after: page));
-                userFollows.AddRange(response.Follows);
-                page = response.Pagination.Cursor;
+                if (response is { })
+                {
+                    userFollows.AddRange(response.Follows);
+                    page = response.Pagination.Cursor;
+                }
             } while (string.IsNullOrEmpty(page) == false);
             
 
             $"Found that user {twitchUser.DisplayName} follows {userFollows.Count} channels: {string.Join(", ", userFollows.Select(x => x.ToUserName))}".Log(nameof(RetrieveChannels), LogLevel.Info);
 
             // Translate those follows into users
-            User[] followedUsers = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(ids: userFollows.Select(x => x.ToUserId).ToList()))).Users;
+            User[] followedUsers = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(ids: userFollows.Select(x => x.ToUserId).ToList())))?.Users;
 
-            $"Translated {userFollows.Count} follows into {followedUsers.Length} users: {string.Join(", ", followedUsers.Select(u => u.DisplayName).ToArray())}".Log(nameof(RetrieveChannels), LogLevel.Info);
-
-            // Translate those users into Channels
-            foreach (User followedUser in followedUsers)
+            if (followedUsers is { })
             {
-                Channel channel = new Channel
-                {
-                    DisplayName = followedUser.DisplayName,
-                    ChannelNumber = followedUser.Id,
-                    ProfileImageUrl = followedUser.ProfileImageUrl
-                };
+                $"Translated {userFollows.Count} follows into {followedUsers.Length} users: {string.Join(", ", followedUsers.Select(u => u.DisplayName).ToArray())}".Log(nameof(RetrieveChannels), LogLevel.Info);
 
-                channels.Add(channel);
+                // Translate those users into Channels
+                foreach (User followedUser in followedUsers)
+                {
+                    Channel channel = new Channel
+                    {
+                        DisplayName = followedUser.DisplayName,
+                        ChannelNumber = followedUser.Id,
+                        ProfileImageUrl = followedUser.ProfileImageUrl
+                    };
+
+                    channels.Add(channel);
+                }
             }
 
             return channels;

@@ -17,16 +17,18 @@ namespace twitch2tuner
         /// <summary>
         /// Invoke the Twitch API
         /// </summary>
-        public static Task<T> UseTwitchApi<T>(Func<TwitchAPI, Task<T>> action)
+        public static async Task<T> UseTwitchApi<T>(Func<TwitchAPI, Task<T>> action)
         {
             try
             {
-                return action(TwitchApi);
+                // Have to await here, instead of just returning the Task,
+                // otherwise we'll miss exceptions
+                return await action(TwitchApi);
             }
             catch (Exception ex)
             {
                 $"Encountered an error invoking the Twitch API: {ex}".Log(nameof(TwitchApiManager), LogLevel.Error);
-                return Task.FromResult(default(T));
+                return default;
             }
         }
     }
