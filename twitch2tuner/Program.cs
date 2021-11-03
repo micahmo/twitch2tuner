@@ -11,6 +11,10 @@ namespace twitch2tuner
     {
         static async Task Main()
         {
+            // Verify the configuration.
+            // This will kill the app if anything is wrong.
+            Config.Verify();
+
             // Use pip (see Dockerfile) to install the latest version of youtube-dl and streamlink every time we start.
             // This command should download on first start, and upgrade on subsequent starts of the image.
             var pipProcess = Process.Start(new ProcessStartInfo
