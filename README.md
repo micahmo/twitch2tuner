@@ -21,7 +21,9 @@ The service acts as an HDHomeRun (m3u) tuner and also proves an XMLTV Electronic
 The first requirement is to gain access to the Twitch API. This requires two components, a Client ID and an Access Token.
 
 ### Client ID
-Go to https://dev.twitch.tv/console/apps and Click `+ Register Your Application`. Add a name, OAuth Redirect URL (which can be anything like `https://google.com`) and a Category. Remember the URL as it will be needed later. After the application is created, click Manage, and save the Client ID.
+Go to https://dev.twitch.tv/console/apps and Click `+ Register Your Application`. Add a name and a Category. You will also have to provide an OAuth Redirect URL. This is the address that Twitch will redirect to when you attempt to obtain an access token (in the next step). This can be anything, such as `https://google.com`. However, if you want, you can use https://query.micahmo.com (disclaimer: another of my projects) which makes it easy to retrieve query parameters from the URL after a redirect. Note that the site runs entirely client-side, so no URL vaules are ever stored. You can look at the [source code](https://github.com/micahmo/QueryStringReader) to verify. If you are not comfortable with this, any other URL will suffice, and you will have to extract the access token from the URL manually.
+
+After the application is created, click Manage, and save the Client ID.
 
 ### Access Token
 Modify the following URL so that `CLIENT_ID` is the id generated above, and `REDIRECT_URI` is the URL entered above. Then navigate to the URL in a browser. It will prompt you to authorize the client to access the Twitch API via your account. Currently it only asks for the `user:read:subscriptions` scope, although others may be needed. Available scopes can be seen here: https://dev.twitch.tv/docs/authentication/#scopes
@@ -32,6 +34,10 @@ After you navigate to the link, it will redirect you back to the previously conf
 ```
 https://www.google.com/#access_token=ACCESS_TOKEN&scope=user%3Aread%3Asubscriptions&token_type=bearer
 ```
+
+If use you used https://query.micahmo.com, you can easily copy the access token.
+
+![](https://user-images.githubusercontent.com/7417301/141585905-072cc346-dda7-4cfe-93b6-89c9ed127579.png)
 
 > Note: This token may eventually expire, which will require you to navigate to the oauth2 URL in order to obtain a new token. It is recommended to save the oauth2 URL with your `CLIENT_ID` and `REDIRECT_URL` for quick access in the future.
 
