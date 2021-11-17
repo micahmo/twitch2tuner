@@ -8,7 +8,7 @@
 
 Inspired by the likes of [locast2plex](https://github.com/tgorgdotcom/locast2plex) and [locast2tuner](https://github.com/wouterdebie/locast2tuner) (formerly [locast2dvr](https://github.com/wouterdebie/locast2dvr)) and the fact that there is no officially supported way to watch Twitch on a Roku device, twitch2tuner aims to present live Twitch streams as channels within Plex's [Live TV and DVR feature](https://support.plex.tv/articles/225877347-live-tv-dvr/).
 
-The service acts as an HDHomeRun (m3u) tuner and also proves an XMLTV Electronic Program Guide (EPG). Together, it allows Plex to show Twitch streams as guide listings and play them on any supported Plex client with limited recording functionality. The channel listings are based on the Twitch channels followed by a particular user (set your username as an environment variable when running the container). Since stream end times (and future stream start times) are unknown, the guide is very imprecise. Live streams are listed as starting at the correct time in the past but ending in 24 hours. Offline streams are always shown as being offline for 24 hours. Of course, this data will be updated as the guide updates. See the [caveats section](https://github.com/micahmo/twitch2tuner#caveats-and-known-issues) for more info about the limitations of the guide. Other features of the guide include the game art as the show art, the current stream description as the show description, and a dot plus the name of the game as the show title for quickly identifying live streams in the guide.
+The service acts as an HDHomeRun (m3u) tuner and also provides an XMLTV Electronic Program Guide (EPG). Together, it allows Plex to show Twitch streams as guide listings and play them on any supported Plex client with limited recording functionality. The channel listings are based on the Twitch channels followed by a particular user (set your username as an environment variable when running the container). Since stream end times (and future stream start times) are unknown, the guide is very imprecise. Live streams are listed as starting at the correct time in the past but ending in 24 hours. Offline streams are always shown as being offline for 24 hours. Of course, this data will be updated as the guide updates. See the [caveats section](https://github.com/micahmo/twitch2tuner#caveats-and-known-issues) for more info about the limitations of the guide. Other features of the guide include the game art as the show art, the current stream description as the show description, and a dot plus the name of the game as the show title for quickly identifying live streams in the guide.
 
 ![Guide Screenshot](https://user-images.githubusercontent.com/7417301/120251579-00b58380-c250-11eb-92dc-f06aca69cd40.png)
 
@@ -18,41 +18,24 @@ The service acts as an HDHomeRun (m3u) tuner and also proves an XMLTV Electronic
 
 ## Twitch API
 
-The first requirement is to gain access to the Twitch API. This requires two components, a Client ID and an Access Token.
+The first requirement is to gain access to the Twitch API using a Client ID and a Client Secret.
 
-### Client ID
-Go to https://dev.twitch.tv/console/apps and Click `+ Register Your Application`. Add a name and a Category. You will also have to provide an OAuth Redirect URL. This is the address that Twitch will redirect to when you attempt to obtain an access token (in the next step). This can be anything, such as `https://google.com`. However, if you want, you can use https://query.micahmo.com (disclaimer: another of my projects) which makes it easy to retrieve query parameters from the URL after a redirect. Note that the site runs entirely client-side, so no URL vaules are ever stored. You can look at the [source code](https://github.com/micahmo/QueryStringReader) to verify. If you are not comfortable with this, any other URL will suffice, and you will have to extract the access token from the URL manually.
+Go to https://dev.twitch.tv/console/apps and Click `+ Register Your Application`. Fill out Name and Category with anything you choose. You will also have to provide an OAuth Redirect URL, which can be anything (such as `https://google.com`) since we won't be using it.
 
-After the application is created, click Manage, and save the Client ID.
-
-### Access Token
-Modify the following URL so that `CLIENT_ID` is the id generated above, and `REDIRECT_URI` is the URL entered above. Then navigate to the URL in a browser. It will prompt you to authorize the client to access the Twitch API via your account. Currently it only asks for the `user:read:subscriptions` scope, although others may be needed. Available scopes can be seen here: https://dev.twitch.tv/docs/authentication/#scopes
-```
-https://id.twitch.tv/oauth2/authorize?client_id=CLIENT_ID&redirect_uri=REDIRECT_URI&response_type=token&scope=user:read:subscriptions
-```
-After you navigate to the link, it will redirect you back to the previously configured redirect URL. For example, if you entered `https://google.com`, it would redirect you to a link that looks like the following. Save the `ACCESS_TOKEN` part.
-```
-https://www.google.com/#access_token=ACCESS_TOKEN&scope=user%3Aread%3Asubscriptions&token_type=bearer
-```
-
-If use you used https://query.micahmo.com, you can easily copy the access token.
-
-![](https://user-images.githubusercontent.com/7417301/141585905-072cc346-dda7-4cfe-93b6-89c9ed127579.png)
-
-> Note: This token may eventually expire, which will require you to navigate to the oauth2 URL in order to obtain a new token. It is recommended to save the oauth2 URL with your `CLIENT_ID` and `REDIRECT_URL` for quick access in the future.
+Click Create. Then click Manage to get back into the application editor. Copy and save the Client ID. Click New Secret to generate a new Client Secret. Copy and save that as well.
 
 ## Install
 
 Now that you have access to the Twitch API, you can install twitch2tuner. It is intended to be run in a Docker container.
-You can use the following docker run command, filling in the `CLIENT_ID`, `ACCESS_TOKEN`, and `USERNAME` as needed.
+You can use the following docker run command, filling in the `CLIENT_ID` and `CLIENT_SECRET`, as retrieved above, and your Twitch `USERNAME`.
 ```
-docker run -d --name=twitch2tuner -p 22708:22708 -e CLIENT_ID=... -e ACCESS_TOKEN=... -e USERNAME=... twitch2tuner
+docker run -d --name=twitch2tuner -p 22708:22708 -e CLIENT_ID=... -e CLIENT_SECRET=... -e USERNAME=... twitch2tuner
 ```
 
-You can optionally pass a value for the `STREAM_UTILITY` environment variable. The accepted values are `YOUTBUE_DL` and `STREAMLINK` with any other value (or empty) defaulting to `STREAMLINK`. This determines the utility that is used to extract the stream URL from Twitch. This is configurable because occasionally the URLs from one utility or the other begin with an ad placeholder embedded at the beginning of the stream. (Fortunately, there is no ad, but it is annoying to wait for the placeholder to count down.) I've had more luck with the URLs obtained by Streamlink, which is why it is the default, but you can experiment to find the best for you.
-```
-... -e STREAM_UTILITY=YOUTUBE_DL ...
-```
+> You can optionally pass a value for the `STREAM_UTILITY` environment variable. The accepted values are `YOUTBUE_DL` and `STREAMLINK` with any other value (or empty) defaulting to `STREAMLINK`. This determines the utility that is used to extract the stream URL from Twitch. This is configurable because occasionally the URLs from one utility or the other begin with an ad placeholder embedded at the beginning of the stream. (Fortunately, there is no ad, but it is annoying to wait for the placeholder to count down.) I've had more luck with the URLs obtained by Streamlink, which is why it is the default, but you can experiment to find the best for you.
+> ```
+> ... -e STREAM_UTILITY=YOUTUBE_DL ...
+> ```
 
 If you'd like to locally test the exact command that is run for a given utility, see the code [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L71) and [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L49).
 
