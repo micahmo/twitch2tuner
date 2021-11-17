@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using Swan.Logging;
 
 namespace twitch2tuner
 {
@@ -13,7 +15,7 @@ namespace twitch2tuner
 
         public static string ClientId => Environment.GetEnvironmentVariable("CLIENT_ID");
 
-        public static string AccessToken => Environment.GetEnvironmentVariable("ACCESS_TOKEN");
+        public static string ClientSecret => Environment.GetEnvironmentVariable("CLIENT_SECRET");
 
         public static string TwitchUsername => Environment.GetEnvironmentVariable("TWITCH_USERNAME");
 
@@ -23,5 +25,44 @@ namespace twitch2tuner
             "STREAMLINK" => Streamlink.Instance,
             _ => Streamlink.Instance,
         };
+
+        /// <summary>
+        /// Verifies that all required configuration values are available
+        /// </summary>
+        /// <param name="exitOnError">Whether this method should exiting the running process when there is an error</param>
+        public static bool Verify(bool exitOnError = true)
+        {
+            bool result = true;
+
+            // First, verify that we have everything we need.
+            if (string.IsNullOrWhiteSpace(ClientId))
+            {
+                "Unable to load CLIENT_ID environment variable".Log(nameof(Program), LogLevel.Fatal);
+                result = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(ClientSecret))
+            {
+                "Unable to load CLIENT_SECRET environment variable".Log(nameof(Program), LogLevel.Fatal);
+                result = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(TwitchUsername))
+            {
+                "Unable to load TWITCH_USERNAME environment variable".Log(nameof(Program), LogLevel.Fatal);
+                result = false;
+            }
+
+            if (exitOnError && !result)
+            {
+                // This is a hack to wait for logging to be flushed since it is totally asynchronous.
+                // See https://github.com/unosquare/swan/issues/221
+                Thread.Sleep(TimeSpan.FromSeconds(1));
+                
+                Environment.Exit(1);
+            }
+
+            return result;
+        }
     }
 }
