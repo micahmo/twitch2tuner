@@ -52,11 +52,9 @@ Once the container is up and running, you can add the server as a Live TV and DV
 
 In Plex, go to Settings > Live TV & DVR > Set Up Plex DVR.
 
-If the server is not found automatically, click "Don't see your HDHomeRun device? Enter its network address manually" and enter the address and port that the server is running on, like `http://192.168.1.2:22708`.
+If the server is not found automatically, click "Don't see your HDHomeRun device? Enter its network address manually" and enter the address and port that the server is running on, like `http://192.168.1.2:22708`. Click Connect. You should see that it has discovered a number of channels equaling the number of Twitch channels that are followed by the configured user.
 
-Once the device is found, click Next. It should detect a channel for each of your followed channels on Twitch. If not, click Scan Channels. Click Continue.
-
-Next it will prompt for a ZIP code to download an electronic guide. In this case, the guide is served by twitch2tuner, so click "Have an XMLTV guide on your server? Click here to use that instead." Then enter the address of the server, followed by `/epg.xml`, like `http://192.168.1.2:22708/epg.xml`. Click Continue.
+Before allowing you to continue, Plex wants to discover the guide. There is a prompt to enter a ZIP code, but the Twitch guide is served by twitch2tuner, so click "Have an XMLTV guide on your server? Click here to use that instead." Then enter the address of the server, followed by `/epg.xml`, like `http://192.168.1.2:22708/epg.xml`. You may enter anything for the Guide Title. Click Continue.
 
 Plex should load the Electronic Program Guide and match the listings to the channel lineup from the tuner. Click Continue.
 
