@@ -15,7 +15,7 @@ namespace twitch2tuner
 
         public static string ClientId => Environment.GetEnvironmentVariable("CLIENT_ID");
 
-        public static string AccessToken => Environment.GetEnvironmentVariable("ACCESS_TOKEN");
+        public static string ClientSecret => Environment.GetEnvironmentVariable("CLIENT_SECRET");
 
         public static string TwitchUsername => Environment.GetEnvironmentVariable("TWITCH_USERNAME");
 
@@ -41,9 +41,9 @@ namespace twitch2tuner
                 result = false;
             }
 
-            if (string.IsNullOrWhiteSpace(AccessToken))
+            if (string.IsNullOrWhiteSpace(ClientSecret))
             {
-                "Unable to load ACCESS_TOKEN environment variable".Log(nameof(Program), LogLevel.Fatal);
+                "Unable to load CLIENT_SECRET environment variable".Log(nameof(Program), LogLevel.Fatal);
                 result = false;
             }
 
