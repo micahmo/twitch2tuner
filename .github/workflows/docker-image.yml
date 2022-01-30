@@ -1,0 +1,22 @@
+name: Publish Docker Image
+
+on: [push, pull_request]
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    # Build
+    - name: Build image
+      run: |
+        [[ $GITHUB_REF_NAME = "master" ]] && TAG="latest" || TAG=$GITHUB_REF_NAME
+        docker build . --file Dockerfile --tag ghcr.io/"${GITHUB_REPOSITORY,,}":$TAG
+    
+    # Push
+    - name: Push image
+      run: |
+        [[ $GITHUB_REF_NAME = "master" ]] && TAG="latest" || TAG=$GITHUB_REF_NAME
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_REPOSITORY_OWNER --password-stdin
+        docker push ghcr.io/"${GITHUB_REPOSITORY,,}":$TAG
