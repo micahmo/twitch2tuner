@@ -2,7 +2,7 @@
 
 # twitch2tuner
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/micahmo/twitch2tuner/Publish%20Docker%20Image)](https://img.shields.io/github/workflow/status/micahmo/twitch2tuner/Publish%20Docker%20Image)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/micahmo/twitch2tuner/Publish%20Docker%20Image)](https://github.com/micahmo/twitch2tuner/pkgs/container/twitch2tuner)
 
 Inspired by the likes of [locast2plex](https://github.com/tgorgdotcom/locast2plex) and [locast2tuner](https://github.com/wouterdebie/locast2tuner) (formerly [locast2dvr](https://github.com/wouterdebie/locast2dvr)) and the fact that there is no officially supported way to watch Twitch on a Roku device, twitch2tuner aims to present live Twitch streams as channels within Plex's [Live TV and DVR feature](https://support.plex.tv/articles/225877347-live-tv-dvr/).
 
