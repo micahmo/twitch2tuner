@@ -9,9 +9,9 @@
   <Description>
     A tuner emulator to play Twitch in Plex
   </Description>
-  <Registry>https://registry.hub.docker.com/u/micahmo/twitch2tuner/</Registry>
+  <Registry>https://github.com/micahmo/twitch2tuner/pkgs/container/twitch2tuner</Registry>
   <GitHub>https://github.com/micahmo/twitch2tuner/</GitHub>
-  <Repository>micahmo/twitch2tuner</Repository>
+  <Repository>ghcr.io/micahmo/twitch2tuner</Repository>
   <!-- Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com -->
   <Icon>https://raw.githubusercontent.com/micahmo/twitch2tuner/master/twitch2tuner-icon.png</Icon>
   <Networking>
