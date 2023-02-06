@@ -98,7 +98,7 @@ namespace twitch2tuner
                     Stop = DateTime.UtcNow.Add(TimeSpan.FromHours(24)).ToString("yyyyMMddHHmmss"),
                     Title = string.Format(channel.IsLive ? liveTitle : offlineTitle, channel.DisplayName, channel.LiveGameName),
                     Description = channel.LiveStreamTitle,
-                    Icon = new Icon { Source = channel.LiveGameArtUrl }
+                    Icon = new Icon { Source = channel.GameIsJustChatting && Config.UseProfileAsJustChatting ? channel.ProfileImageUrl : channel.LiveGameArtUrl }
                 });
             }
 

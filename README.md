@@ -30,10 +30,20 @@ You can use the following docker run command, filling in the `CLIENT_ID` and `CL
 docker run -d --name=twitch2tuner -p 22708:22708 -e CLIENT_ID=... -e CLIENT_SECRET=... -e USERNAME=... twitch2tuner
 ```
 
-> You can optionally pass a value for the `STREAM_UTILITY` environment variable. The accepted values are `YOUTBUE_DL` and `STREAMLINK` with any other value (or empty) defaulting to `STREAMLINK`. This determines the utility that is used to extract the stream URL from Twitch. This is configurable because occasionally the URLs from one utility or the other begin with an ad placeholder embedded at the beginning of the stream. (Fortunately, there is no ad, but it is annoying to wait for the placeholder to count down.) I've had more luck with the URLs obtained by Streamlink, which is why it is the default, but you can experiment to find the best for you.
-> ```
-> ... -e STREAM_UTILITY=YOUTUBE_DL ...
-> ```
+### Other Options
+
+* `STREAM_UTILITY`
+
+  You can optionally pass a value for the `STREAM_UTILITY` environment variable. The accepted values are `YOUTBUE_DL` and `STREAMLINK` with any other value (or empty) defaulting to `STREAMLINK`. This determines the utility that is used to extract the stream URL from Twitch. This is configurable because occasionally the URLs from one utility or the other begin with an ad placeholder embedded at the beginning of the stream. (Fortunately, there is no ad, but it is annoying to wait for the placeholder to count down.) I've had more luck with the URLs obtained by Streamlink, which is why it is the default, but you can experiment to find the best for you.
+  ```
+  -e STREAM_UTILITY=YOUTUBE_DL
+  ```
+* `USE_PROFILE_AS_JUST_CHATTING`
+  
+  When a streamer is "Just Chatting", you may wish to see their profile picture, instead of the generic Twitch image, as the program artwork. If so, set `USE_PROFILE_AS_JUST_CHATTING` to `true`.
+  ```
+  -e USE_PROFILE_AS_JUST_CHATTING=true
+  ```
 
 If you'd like to locally test the exact command that is run for a given utility, see the code [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L71) and [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L49).
 

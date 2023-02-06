@@ -59,6 +59,7 @@ namespace twitch2tuner
             channel.LiveGameName = stream?.GameName;
             channel.LiveStreamTitle = stream?.Title;
             channel.LiveStreamStartedDateTime = stream?.StartedAt;
+            channel.GameIsJustChatting = stream?.GameId == JustChattingGameId;
 
             // If the user is streaming, get the game art
             if (stream is { })
@@ -123,6 +124,8 @@ namespace twitch2tuner
         }
 
         private static List<Channel> _channels = new List<Channel>();
+
+        private const string JustChattingGameId = "509658";
     }
 
     /// <summary>

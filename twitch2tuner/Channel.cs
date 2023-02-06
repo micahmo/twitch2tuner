@@ -59,5 +59,10 @@ namespace twitch2tuner
         /// The profile image for the channel
         /// </summary>
         public string ProfileImageUrl { get; set; }
+
+        /// <summary>
+        /// Whether the game being played is "Just Chatting"
+        /// </summary>
+        public bool GameIsJustChatting { get; set; }
     }
 }

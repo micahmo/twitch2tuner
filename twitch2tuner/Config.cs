@@ -26,6 +26,10 @@ namespace twitch2tuner
             _ => Streamlink.Instance,
         };
 
+        public static bool UseProfileAsJustChatting =>
+            bool.TryParse(Environment.GetEnvironmentVariable("USE_PROFILE_AS_JUST_CHATTING"), out bool useProfileAsJustChatting)
+            && useProfileAsJustChatting;
+
         /// <summary>
         /// Verifies that all required configuration values are available
         /// </summary>
