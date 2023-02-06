@@ -94,8 +94,8 @@ namespace twitch2tuner
                 tv.Programmes.Add(new Programme
                 {
                     Channel = channel.DisplayName,
-                    Start = (channel.LiveStreamStartedDateTime ?? DateTime.Now.Subtract(TimeSpan.FromHours(1))).ToString("yyyyMMddHHmmss zzz"),
-                    Stop = DateTime.Now.Add(TimeSpan.FromHours(24)).ToString("yyyyMMddHHmmss zzz"),
+                    Start = (channel.LiveStreamStartedDateTime ?? DateTime.UtcNow.Subtract(TimeSpan.FromHours(1))).ToString("yyyyMMddHHmmss"),
+                    Stop = DateTime.UtcNow.Add(TimeSpan.FromHours(24)).ToString("yyyyMMddHHmmss"),
                     Title = string.Format(channel.IsLive ? liveTitle : offlineTitle, channel.DisplayName, channel.LiveGameName),
                     Description = channel.LiveStreamTitle,
                     Icon = new Icon { Source = channel.LiveGameArtUrl }
