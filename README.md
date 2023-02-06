@@ -68,6 +68,8 @@ Plex should load the Electronic Program Guide and match the listings to the chan
 
 Finally, Plex should download the guide, and it should be ready to use!
 
+To keep the guide relatively up-to-date, you should go to Settings > Live TV & DVR > DVR Settings > and change Guide Refresh Interval to the lowest number (1 hour).
+
 # Caveats and Known Issues
 
 This is an imperfect solution, as Twitch is obviously not designed to be served in a traditional TV guide. Watch out for the following.
@@ -77,6 +79,7 @@ This is an imperfect solution, as Twitch is obviously not designed to be served 
  - This project is very much untested with regards to Plex's DVR feature. As with any project that is piecing together things that were not intended to work together, YMMV!
     - While DVR has has not been thoroughly tested, one thing that does work nicely is pausing and/or rewinding live streams.
  - While the ability to pause and rewind a live stream is nice, there is a small quirk where the stream will end immediately when the streamer goes offline even if you are not at the end. (In other words, it will not play till the end of the stream if you are watching behind live.) 
+ - Playback does not seem to work in the Windows desktop app. It has been tested and works on Roku, Android, and in the Chrome web player.
 
 # Misc
 
