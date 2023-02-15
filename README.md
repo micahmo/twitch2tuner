@@ -27,7 +27,7 @@ Click Create. Then click Manage to get back into the application editor. Copy an
 Now that you have access to the Twitch API, you can install twitch2tuner. It is intended to be run in a Docker container.
 You can use the following docker run command, filling in the `CLIENT_ID` and `CLIENT_SECRET`, as retrieved above, and your Twitch `USERNAME`.
 ```
-docker run -d --name=twitch2tuner -p 22708:22708 -e CLIENT_ID=... -e CLIENT_SECRET=... -e USERNAME=... twitch2tuner
+docker run -d --name=twitch2tuner -p 22708:22708 -e CLIENT_ID=... -e CLIENT_SECRET=... -e USERNAME=... ghcr.io/micahmo/twitch2tuner
 ```
 
 ### Other Options
