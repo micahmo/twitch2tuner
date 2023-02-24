@@ -105,12 +105,16 @@ namespace twitch2tuner
 
             $"Found that user {twitchUser.DisplayName} follows {userFollows.Count} channels: {string.Join(", ", userFollows.Select(x => x.ToUserName))}".Log(nameof(RetrieveChannels), LogLevel.Info);
 
-            // Translate those follows into users
-            User[] followedUsers = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(ids: userFollows.Select(x => x.ToUserId).ToList()), nameof(TwitchAPI.Helix.Users.GetUsersAsync)))?.Users;
-
-            if (followedUsers is { })
+            // Translate those follows into users, 100 at a time
+            List<User> followedUsers = new List<User>();
+            foreach (var subset in userFollows.Chunk(100))
             {
-                $"Translated {userFollows.Count} follows into {followedUsers.Length} users: {string.Join(", ", followedUsers.Select(u => u.DisplayName).ToArray())}".Log(nameof(RetrieveChannels), LogLevel.Info);
+                followedUsers.AddRange((await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(ids: subset.Select(x => x.ToUserId).ToList()), nameof(TwitchAPI.Helix.Users.GetUsersAsync)))?.Users ?? Enumerable.Empty<User>());
+            }
+
+            if (followedUsers.Any())
+            {
+                $"Translated {userFollows.Count} follows into {followedUsers.Count} users: {string.Join(", ", followedUsers.Select(u => u.DisplayName).ToArray())}".Log(nameof(RetrieveChannels), LogLevel.Info);
 
                 // Translate those users into Channels
                 foreach (User followedUser in followedUsers)
