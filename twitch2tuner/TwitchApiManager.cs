@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Swan.Logging;
 using TwitchLib.Api;
 using TwitchLib.Api.Core;
@@ -25,11 +26,12 @@ namespace twitch2tuner
         /// Invoke the Twitch API
         /// </summary>
         /// <param name="action">The action to invoke on the current instance of the Twitch API client</param>
+        /// <param name="method">The name of the method being invoked (for logging purposes)</param>
         /// <param name="tryRefreshToken">
         /// Whether or not this method is allowed to attempt to get a new access token if the current one is empty or expired.
         /// Set this to false when invoking this method recursively.
         /// </param>
-        public static async Task<T> UseTwitchApi<T>(Func<TwitchAPI, Task<T>> action, bool tryRefreshToken = true, [CallerMemberName] string method = "")
+        public static async Task<T> UseTwitchApi<T>(Func<TwitchAPI, Task<T>> action, string method, bool tryRefreshToken = true)
         {
             if (string.IsNullOrEmpty(TwitchApi.Settings.AccessToken) && tryRefreshToken)
             {
@@ -53,7 +55,7 @@ namespace twitch2tuner
                     // If it works, try to invoke this method again on behalf of the caller before giving up.
                     if (await RetrieveAccessToken())
                     {
-                        return await UseTwitchApi(action, tryRefreshToken: false);
+                        return await UseTwitchApi(action, method, tryRefreshToken: false);
                     }
                 }
 
@@ -87,7 +89,7 @@ namespace twitch2tuner
 
             // Do a simple call to see if the token is good
             // Set tryRefreshToken to false so we don't accidentally come back here
-            User twitchUser = (await UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> {Config.TwitchUsername}), tryRefreshToken: false))?.Users.FirstOrDefault();
+            User twitchUser = (await UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> {Config.TwitchUsername}), nameof(TwitchAPI.Helix.Users.GetUsersAsync), tryRefreshToken: false))?.Users.FirstOrDefault();
 
             if (twitchUser is null)
             {
@@ -95,7 +97,7 @@ namespace twitch2tuner
                 return false;
             }
 
-            $"Successfully got new access token and was able to retrieve user {Config.TwitchUsername}.".Log(nameof(RetrieveAccessToken), LogLevel.Info);
+            $"Successfully got new access token and was able to retrieve user {JsonConvert.SerializeObject(twitchUser)}.".Log(nameof(RetrieveAccessToken), LogLevel.Info);
             return true;
         }
     }

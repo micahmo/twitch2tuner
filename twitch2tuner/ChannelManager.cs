@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Swan.Logging;
+using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
 using TwitchLib.Api.Helix.Models.Users.GetUserFollows;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
@@ -51,7 +52,7 @@ namespace twitch2tuner
         public static async Task UpdateLiveStatus(Channel channel)
         {
             // See if the user is streaming
-            Stream stream = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Streams.GetStreamsAsync(userIds: new List<string> {channel.ChannelNumber})))?.Streams.FirstOrDefault();
+            Stream stream = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Streams.GetStreamsAsync(userIds: new List<string> {channel.ChannelNumber}), nameof(TwitchAPI.Helix.Streams.GetStreamsAsync)))?.Streams.FirstOrDefault();
 
             channel.IsLive = stream is { };
             channel.LiveStreamId = stream?.Id;
@@ -64,7 +65,7 @@ namespace twitch2tuner
             // If the user is streaming, get the game art
             if (stream is { })
             {
-                var game = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Games.GetGamesAsync(new List<string> {stream.GameId})))?.Games.FirstOrDefault();
+                var game = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Games.GetGamesAsync(new List<string> {stream.GameId}), nameof(TwitchAPI.Helix.Games.GetGamesAsync)))?.Games.FirstOrDefault();
                 channel.LiveGameArtUrl = game?.BoxArtUrl.Replace("{width}", "272").Replace("{height}", "380");
             }
         }
@@ -74,7 +75,7 @@ namespace twitch2tuner
             List<Channel> channels = new List<Channel>();
 
             // Get the Twitch user
-            User twitchUser = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> { Config.TwitchUsername })))?.Users.FirstOrDefault();
+            User twitchUser = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> { Config.TwitchUsername }), nameof(TwitchAPI.Helix.Users.GetUsersAsync)))?.Users.FirstOrDefault();
 
             if (twitchUser is null)
             {
@@ -88,11 +89,16 @@ namespace twitch2tuner
             // Get the users that the user follows. Have to use pagination with this call.
             do
             {
-                GetUsersFollowsResponse response = await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersFollowsAsync(fromId: twitchUser.Id, after: page));
+                GetUsersFollowsResponse response = await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersFollowsAsync(fromId: twitchUser.Id, after: page), nameof(TwitchAPI.Helix.Users.GetUsersFollowsAsync));
                 if (response is { })
                 {
+                    $"Got {response.Follows.Length} follows in page. Adding to list of userFollows".Log(nameof(UpdateChannels), LogLevel.Info);
                     userFollows.AddRange(response.Follows);
                     page = response.Pagination.Cursor;
+                }
+                else
+                {
+                    "Got empty response when querying user follows".Log(nameof(UpdateChannels), LogLevel.Warning);
                 }
             } while (string.IsNullOrEmpty(page) == false);
             
@@ -100,7 +106,7 @@ namespace twitch2tuner
             $"Found that user {twitchUser.DisplayName} follows {userFollows.Count} channels: {string.Join(", ", userFollows.Select(x => x.ToUserName))}".Log(nameof(RetrieveChannels), LogLevel.Info);
 
             // Translate those follows into users
-            User[] followedUsers = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(ids: userFollows.Select(x => x.ToUserId).ToList())))?.Users;
+            User[] followedUsers = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(ids: userFollows.Select(x => x.ToUserId).ToList()), nameof(TwitchAPI.Helix.Users.GetUsersAsync)))?.Users;
 
             if (followedUsers is { })
             {
