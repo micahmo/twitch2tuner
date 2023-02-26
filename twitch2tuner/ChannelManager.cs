@@ -98,28 +98,43 @@ namespace twitch2tuner
                     await Task.Delay(TimeSpan.FromSeconds(10));
                 }
 
-                // TODO: Replace this with TwitchLib call when available
-                // https://github.com/TwitchLib/TwitchLib/issues/1112
-                var response = await (await "https://api.twitch.tv"
-                    .AppendPathSegment("helix")
-                    .AppendPathSegment("channels")
-                    .AppendPathSegment("followed")
-                    .SetQueryParam("user_id", twitchUser.Id)
-                    .WithHeader("client-id", Config.ClientId)
-                    .WithHeader("Authorization", $"Bearer {TwitchApiManager.TwitchApi.Settings.AccessToken}")
-                    .AllowAnyHttpStatus()
-                    .GetAsync()).GetJsonAsync();
+                string page = string.Empty;
 
-                try
+                while (page is not null)
                 {
-                    foreach (var follow in response.data)
+                    // TODO: Replace this with TwitchLib call when available
+                    // https://github.com/TwitchLib/TwitchLib/issues/1112
+                    var response = await (await "https://api.twitch.tv"
+                        .AppendPathSegment("helix")
+                        .AppendPathSegment("channels")
+                        .AppendPathSegment("followed")
+                        .SetQueryParam("user_id", twitchUser.Id)
+                        .SetQueryParam("after", page)
+                        .WithHeader("client-id", Config.ClientId)
+                        .WithHeader("Authorization", $"Bearer {TwitchApiManager.TwitchApi.Settings.AccessToken}")
+                        .AllowAnyHttpStatus()
+                        .GetAsync()).GetJsonAsync();
+
+                    try
                     {
-                        followedLogins.Add(follow.broadcaster_login);
+                        page = response.pagination.cursor;
                     }
-                }
-                catch
-                {
-                    $"Error retrieving follows: {JsonConvert.SerializeObject(response)}".Log(nameof(RetrieveChannels), LogLevel.Info);
+                    catch
+                    {
+                        page = null;
+                    }
+
+                    try
+                    {
+                        foreach (var follow in response.data)
+                        {
+                            followedLogins.Add(follow.broadcaster_login);
+                        }
+                    }
+                    catch
+                    {
+                        $"Error retrieving follows: {JsonConvert.SerializeObject(response)}".Log(nameof(RetrieveChannels), LogLevel.Info);
+                    }
                 }
 
                 $"Found that user {twitchUser.DisplayName} follows {followedLogins.Count} channels: {string.Join(", ", followedLogins)}".Log(nameof(RetrieveChannels), LogLevel.Info);
