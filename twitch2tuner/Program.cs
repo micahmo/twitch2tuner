@@ -27,8 +27,8 @@ namespace twitch2tuner
             });
             pipProcess?.StandardOutput.ReadToEnd().Log(nameof(Main), LogLevel.Info);
 
-            await ChannelManager.UpdateChannels(UpdateChannelMode.Retrieve | UpdateChannelMode.Status);
             StartServer();
+            await ChannelManager.UpdateChannels(UpdateChannelMode.Retrieve | UpdateChannelMode.Status);
             Thread.Sleep(Timeout.Infinite);
         }
 
@@ -48,7 +48,10 @@ namespace twitch2tuner
                 .WithModule(new ActionModule("/lineup.json", HttpVerbs.Any, Tuner.Lineup))
                 .WithModule(new ActionModule("/lineup.post", HttpVerbs.Any, Tuner.Lineup))
                 .WithModule(new ActionModule("/epg.xml", HttpVerbs.Any, Tuner.Epg))
-                .WithModule(new ActionModule("/getStream", HttpVerbs.Any, Tuner.GetStream));
+                .WithModule(new ActionModule("/getStream", HttpVerbs.Any, Tuner.GetStream))
+                .WithModule(new ActionModule("/authorize", HttpVerbs.Any, TwitchApiManager.AuthorizeUser))
+                .WithModule(new ActionModule("/redirect", HttpVerbs.Any, TwitchApiManager.HandleAuthorizeUser))
+                .WithModule(new ActionModule("/favicon.ico", HttpVerbs.Any, _ => Task.CompletedTask));
 
             // Important: Do not ignore write exceptions, but let them bubble up.
             // This allows us to see when a client disconnects, so that we can stop streaming.

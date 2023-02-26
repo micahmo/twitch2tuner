@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
+using System.Text;
 using System.Threading.Tasks;
+using EmbedIO;
 using Newtonsoft.Json;
 using Swan.Logging;
 using TwitchLib.Api;
+using TwitchLib.Api.Auth;
 using TwitchLib.Api.Core;
+using TwitchLib.Api.Core.Enums;
 using TwitchLib.Api.Core.Exceptions;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
@@ -17,9 +17,10 @@ namespace twitch2tuner
 {
     public static class TwitchApiManager
     {
-        private static readonly TwitchAPI TwitchApi = new TwitchAPI(settings: new ApiSettings
+        public static TwitchAPI TwitchApi { get; } = new(settings: new ApiSettings
         {
-            ClientId = Config.ClientId
+            ClientId = Config.ClientId,
+            Secret = Config.ClientSecret
         });
 
         /// <summary>
@@ -53,7 +54,8 @@ namespace twitch2tuner
                 {
                     // These are the exceptions potentially caused by an expired access token. Try to get a new one.
                     // If it works, try to invoke this method again on behalf of the caller before giving up.
-                    if (await RetrieveAccessToken())
+                    if ((Config.Scopes.Any() && !string.IsNullOrEmpty(Config.RefreshToken) && await RefreshToken()) // User token refresh
+                        || await RetrieveAccessToken()) // App token refresh
                     {
                         return await UseTwitchApi(action, method, tryRefreshToken: false);
                     }
@@ -65,27 +67,17 @@ namespace twitch2tuner
 
         private static async Task<bool> RetrieveAccessToken()
         {
-            "Attempting to retrieve new access token using client credentials flow.".Log(nameof(UseTwitchApi), LogLevel.Info);
+            "Attempting to retrieve new access token using client credentials flow.".Log(nameof(RetrieveAccessToken), LogLevel.Info);
 
-            HttpResponseMessage responseMessage = await new HttpClient().PostAsync(
-                "https://id.twitch.tv/oauth2/token?" +
-                $"client_id={Config.ClientId}&" +
-                $"client_secret={Config.ClientSecret}&" +
-                "grant_type=client_credentials&" +
-                "scope=user:read:subscriptions", new HttpResponseMessage().Content);
-
-            JsonElement jsonResponse = await responseMessage.Content.ReadFromJsonAsync<JsonElement>();
-            jsonResponse.TryGetProperty("access_token", out var accessTokenJson);
-            string accessToken = accessTokenJson.ToString();
-
-            if (string.IsNullOrEmpty(accessToken))
+            try
             {
-                $"There was an error retrieving new access token via client credentials flow. {jsonResponse}".Log(nameof(UseTwitchApi), LogLevel.Error);
+                TwitchApi.Settings.AccessToken = await TwitchApi.Auth.GetAccessTokenAsync();
+            }
+            catch (Exception ex)
+            {
+                $"There was an error retrieving new app access token. {ex}".Log(nameof(RetrieveAccessToken), LogLevel.Error);
                 return false;
             }
-
-            // Assign the token to the client
-            TwitchApi.Settings.AccessToken = accessToken;
 
             // Do a simple call to see if the token is good
             // Set tryRefreshToken to false so we don't accidentally come back here
@@ -93,12 +85,67 @@ namespace twitch2tuner
 
             if (twitchUser is null)
             {
-                $"Got new access token, but unable to retrieve user {Config.TwitchUsername}. New access token may be bad. {jsonResponse}".Log(nameof(RetrieveAccessToken), LogLevel.Error);
+                $"Got new access token, but unable to retrieve user {Config.TwitchUsername}. New access token may be bad.".Log(nameof(RetrieveAccessToken), LogLevel.Error);
                 return false;
             }
 
             $"Successfully got new access token and was able to retrieve user {JsonConvert.SerializeObject(twitchUser)}.".Log(nameof(RetrieveAccessToken), LogLevel.Info);
             return true;
+        }
+
+        private static async Task<bool> RefreshToken()
+        {
+            RefreshResponse response = await TwitchApi.Auth.RefreshAuthTokenAsync(Config.RefreshToken, Config.ClientSecret);
+
+            if (!string.IsNullOrEmpty(response.AccessToken))
+            {
+                TwitchApi.Settings.AccessToken = response.AccessToken;
+                Config.Scopes.Clear();
+                Config.Scopes.AddRange(response.Scopes);
+                Config.RefreshToken = response.RefreshToken;
+
+                "Successfully refreshed user token".Log(nameof(RefreshToken), LogLevel.Info);
+
+                return true;
+            }
+
+            "Failed to refresh user token".Log(nameof(RefreshToken), LogLevel.Error);
+
+            return false;
+        }
+
+        public static Task AuthorizeUser(IHttpContext httpContext)
+        {
+            string authorizationUrl = TwitchApi.Auth.GetAuthorizationCodeUrl(Config.RedirectUri, new List<AuthScopes> { AuthScopes.Helix_User_Read_Follows });
+
+            $"Redirecting user to authorization code flow URL: {authorizationUrl}".Log(nameof(AuthorizeUser), LogLevel.Info);
+
+            httpContext.Redirect(authorizationUrl);
+
+            return Task.CompletedTask;
+        }
+
+        public static async Task HandleAuthorizeUser(IHttpContext httpContext)
+        {
+            try
+            {
+                string code = httpContext.Request.QueryString["code"];
+                
+                // Exchange the authorization for a token
+                AuthCodeResponse response = await TwitchApi.Auth.GetAccessTokenFromCodeAsync(code, Config.ClientSecret, Config.RedirectUri);
+
+                TwitchApi.Settings.AccessToken = response.AccessToken;
+                Config.Scopes.AddRange(response.Scopes.ToList());
+                Config.RefreshToken = response.RefreshToken;
+
+                $"Successfully converted auth code into user access token which expires in {TimeSpan.FromSeconds(response.ExpiresIn)}".Log(nameof(HandleAuthorizeUser), LogLevel.Info);
+                await httpContext.SendStringAsync("Authorization successful. You may now close this page.", "text/html", Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                $"Error performing authorization: {ex}".Log(nameof(HandleAuthorizeUser), LogLevel.Error);
+                await httpContext.SendStringAsync("Authorization failed. Please try again.", "text/html", Encoding.UTF8);
+            }
         }
     }
 }

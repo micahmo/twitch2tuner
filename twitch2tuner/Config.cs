@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Swan.Logging;
 
@@ -29,6 +31,16 @@ namespace twitch2tuner
         public static bool UseProfileAsJustChatting =>
             bool.TryParse(Environment.GetEnvironmentVariable("USE_PROFILE_AS_JUST_CHATTING"), out bool useProfileAsJustChatting)
             && useProfileAsJustChatting;
+
+        public static IEnumerable<string> ChannelsFollowed => Environment.GetEnvironmentVariable("CHANNELS_FOLLOWED")?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? Enumerable.Empty<string>();
+
+        public static List<string> Scopes { get; } = new();
+
+        public static string RefreshToken { get; set; }
+
+        public static string CustomDomain => Environment.GetEnvironmentVariable("CUSTOM_DOMAIN");
+
+        public static string RedirectUri => string.IsNullOrEmpty(CustomDomain) ? "https://google.com" : $"{CustomDomain}/redirect";
 
         /// <summary>
         /// Verifies that all required configuration values are available

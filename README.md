@@ -16,11 +16,53 @@ The service acts as an HDHomeRun (m3u) tuner and also provides an XMLTV Electron
 
 ## Twitch API
 
-The first requirement is to gain access to the Twitch API using a Client ID and a Client Secret.
+The first requirement is to gain access to the Twitch API by creating a new application.
 
-Go to https://dev.twitch.tv/console/apps and Click `+ Register Your Application`. Fill out Name and Category with anything you choose. You will also have to provide an OAuth Redirect URL, which can be anything (such as `https://google.com`) since we won't be using it.
+1. Go to https://dev.twitch.tv/console/apps.
+2. Click `+ Register Your Application`.
+3. Fill out Name and Category with anything you choose.
+4. For the OAuth Redirect URL, use `https://google.com`.
+5. Click Create.
+6. Click Manage to get back into the application editor.
+7. Copy and save the Client ID. Click New Secret to generate a new Client Secret. Copy and save that as well.
 
-Click Create. Then click Manage to get back into the application editor. Copy and save the Client ID. Click New Secret to generate a new Client Secret. Copy and save that as well.
+## Followed Channels
+
+twitch2tuner uses the channels that you follow on Twitch as the basis for the guide. However, as of [Feb 2023](https://discuss.dev.twitch.tv/t/follows-endpoints-and-eventsub-subscription-type-are-now-available-in-open-beta/43322), Twitch is restricting access to user follow data. To populate the guide, there are now two options.
+
+### Option 1: Manually Specify
+
+You may specify the list of desired channels as a comma-delimited list in the `CHANNELS_FOLLOWED` environment variable. When this variable is set, it takes precedence.
+* Be sure to use the channel's username (from their page's URL), not their display name. For https://www.twitch.tv/espnesports you would use `espnesports`, not `ESPN Esports`.
+   ```
+   -e CHANNELS_FOLLOWED=xqc,espnesports
+   ```
+
+### Option 2: Authorize App
+When twitch2tuner starts and `CHANNELS_FOLLOWED` is not set, you will see this message: `No followed channels specified in CHANNELS_FOLLOWED. Need user token to retrieve user's followed channels via Twitch API. Please visit /authorize. Waiting 10 seconds.`.
+
+Once you see this, you must authorize your instance of twitch2tuner to make Twitch API calls on your behalf. The instructions are slightly different depending whether you are accessing your instance directly (without TLS) under via a custom domain with TLS (e.g., behind a reverse proxy or ngrok).
+
+#### No TLS
+
+Start the service using the instructions below. Once you see the message, navigate to `http://IP:Port/authorize` (e.g., `http://192.168.1.2:22708/authorize`). There you will be redirected to Twitch where you can authorize your instance of twitch2tuner.
+
+At this point, it will redirect back to `https://google.com`. Replace that with your `http://IP:Port/redirect`. (e.g., `http://192.168.1.2:22708/redirect/?code=...`). It should authorize, and you may close the tab. Check the logs to verify that it is able to load your follows.
+
+#### TLS
+
+If you are accessing your service via a custom domain with TLS, first, navigate back to the [dev console](https://dev.twitch.tv/console/apps), Manage your application, and add a new Redirect URL for `https://your.domain` followed by `/redirect` (e.g., `https://id.ngrok.io/redirect`).
+
+Then, set the `CUSTOM_DOMAIN` environment variable to your domain name (without `/redirect`).
+```
+-e CUSTOM_DOMAIN=https://id.ngrok.io
+```
+
+Start the service using the instructions below. Once you see the message appear, navigate to `https://your.domain/authorize` (e.g., `https://id.ngrok.io/authorize`). There you will be redirected to Twitch where you can authorize your instance of twitch2tuner. It should redirect back to your domain, at which point you may close the tab. Check the logs to verify that it is able to load your follows.
+
+---
+
+You should not have to do this procedure again as long as the service is running (it handles refreshing your user token internally). However, you will have to do it again after restarting (as the token is not currently persisted outside of the service).
 
 ## Install
 
@@ -38,14 +80,17 @@ docker run -d --name=twitch2tuner -p 22708:22708 -e CLIENT_ID=... -e CLIENT_SECR
   ```
   -e STREAM_UTILITY=YOUTUBE_DL
   ```
+
+   If you'd like to locally test the exact command that is run for a given utility, see the code [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L71) and [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L49).
+
+
 * `USE_PROFILE_AS_JUST_CHATTING`
+
   
   When a streamer is "Just Chatting", you may wish to see their profile picture, instead of the generic Twitch image, as the program artwork. If so, set `USE_PROFILE_AS_JUST_CHATTING` to `true`.
   ```
   -e USE_PROFILE_AS_JUST_CHATTING=true
   ```
-
-If you'd like to locally test the exact command that is run for a given utility, see the code [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L71) and [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L49).
 
 ### Unraid
 

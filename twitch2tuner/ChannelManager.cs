@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Flurl;
+using Flurl.Http;
+using Newtonsoft.Json;
 using Swan.Logging;
 using TwitchLib.Api;
+using TwitchLib.Api.Helix;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
-using TwitchLib.Api.Helix.Models.Users.GetUserFollows;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
 namespace twitch2tuner
@@ -74,49 +77,71 @@ namespace twitch2tuner
         {
             List<Channel> channels = new List<Channel>();
 
-            // Get the Twitch user
-            User twitchUser = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> { Config.TwitchUsername }), nameof(TwitchAPI.Helix.Users.GetUsersAsync)))?.Users.FirstOrDefault();
-
-            if (twitchUser is null)
+            List<string> followedLogins = new List<string>();
+            if (Config.ChannelsFollowed?.Any() != true)
             {
-                $"Unable to find Twitch user {Config.TwitchUsername}".Log(nameof(UpdateChannels), LogLevel.Error);
-                return channels;
+                // Get the Twitch user
+                User twitchUser = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> { Config.TwitchUsername }), nameof(TwitchAPI.Helix.Users.GetUsersAsync)))?.Users.FirstOrDefault();
+
+                if (twitchUser is null)
+                {
+                    $"Unable to find Twitch user {Config.TwitchUsername}".Log(nameof(RetrieveChannels), LogLevel.Error);
+                    return channels;
+                }
+
+                while (!Config.Scopes.Contains("user:read:follows"))
+                {
+                    // We must have a user token with this scope.
+                    // Wait for the user to authenticate in the browser.
+
+                    "No followed channels specified in CHANNELS_FOLLOWED. Need user token to retrieve user's followed channels via Twitch API. Please visit /authorize. Waiting 10 seconds.".Log(nameof(RetrieveChannels), LogLevel.Info);
+                    await Task.Delay(TimeSpan.FromSeconds(10));
+                }
+
+                // TODO: Replace this with TwitchLib call when available
+                // https://github.com/TwitchLib/TwitchLib/issues/1112
+                var response = await (await "https://api.twitch.tv"
+                    .AppendPathSegment("helix")
+                    .AppendPathSegment("channels")
+                    .AppendPathSegment("followed")
+                    .SetQueryParam("user_id", twitchUser.Id)
+                    .WithHeader("client-id", Config.ClientId)
+                    .WithHeader("Authorization", $"Bearer {TwitchApiManager.TwitchApi.Settings.AccessToken}")
+                    .AllowAnyHttpStatus()
+                    .GetAsync()).GetJsonAsync();
+
+                try
+                {
+                    foreach (var follow in response.data)
+                    {
+                        followedLogins.Add(follow.broadcaster_login);
+                    }
+                }
+                catch
+                {
+                    $"Error retrieving follows: {JsonConvert.SerializeObject(response)}".Log(nameof(RetrieveChannels), LogLevel.Info);
+                }
+
+                $"Found that user {twitchUser.DisplayName} follows {followedLogins.Count} channels: {string.Join(", ", followedLogins)}".Log(nameof(RetrieveChannels), LogLevel.Info);
+            }
+            else
+            {
+                $"Followed channels were provided via config: {string.Join(", ", Config.ChannelsFollowed)}".Log(nameof(RetrieveChannels), LogLevel.Info);
+                followedLogins.AddRange(Config.ChannelsFollowed);
             }
 
-            string page = string.Empty;
-            List<Follow> userFollows = new List<Follow>();
-
-            // Get the users that the user follows. Have to use pagination with this call.
-            do
-            {
-                GetUsersFollowsResponse response = await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersFollowsAsync(fromId: twitchUser.Id, after: page), nameof(TwitchAPI.Helix.Users.GetUsersFollowsAsync));
-                if (response is { })
-                {
-                    $"Got {response.Follows.Length} follows in page. Adding to list of userFollows".Log(nameof(UpdateChannels), LogLevel.Info);
-                    userFollows.AddRange(response.Follows);
-                    page = response.Pagination.Cursor;
-                }
-                else
-                {
-                    "Got empty response when querying user follows".Log(nameof(UpdateChannels), LogLevel.Warning);
-                }
-            } while (string.IsNullOrEmpty(page) == false);
-            
-
-            $"Found that user {twitchUser.DisplayName} follows {userFollows.Count} channels: {string.Join(", ", userFollows.Select(x => x.ToUserName))}".Log(nameof(RetrieveChannels), LogLevel.Info);
-
-            // Translate those follows into users, 100 at a time
+            // Translate those follows into Users, 100 at a time
             List<User> followedUsers = new List<User>();
-            foreach (var subset in userFollows.Chunk(100))
+            foreach (var subset in followedLogins.Chunk(100))
             {
-                followedUsers.AddRange((await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(ids: subset.Select(x => x.ToUserId).ToList()), nameof(TwitchAPI.Helix.Users.GetUsersAsync)))?.Users ?? Enumerable.Empty<User>());
+                followedUsers.AddRange((await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Users.GetUsersAsync(logins: subset.ToList()), nameof(Helix.Users.GetUsersAsync)))?.Users ?? Enumerable.Empty<User>());
             }
 
             if (followedUsers.Any())
             {
-                $"Translated {userFollows.Count} follows into {followedUsers.Count} users: {string.Join(", ", followedUsers.Select(u => u.DisplayName).ToArray())}".Log(nameof(RetrieveChannels), LogLevel.Info);
+                $"Translated {followedLogins.Count} follows into {followedUsers.Count} users: {string.Join(", ", followedUsers.Select(u => u.DisplayName).ToArray())}".Log(nameof(RetrieveChannels), LogLevel.Info);
 
-                // Translate those users into Channels
+                // Translate those Users into Channels
                 foreach (User followedUser in followedUsers)
                 {
                     Channel channel = new Channel
@@ -133,7 +158,7 @@ namespace twitch2tuner
             return channels;
         }
 
-        private static List<Channel> _channels = new List<Channel>();
+        private static List<Channel> _channels = new();
 
         private const string JustChattingGameId = "509658";
     }
