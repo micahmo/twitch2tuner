@@ -56,7 +56,9 @@ namespace twitch2tuner
 
         public static async Task Lineup(IHttpContext context)
         {
-            string publicAddress = context.Request.Url.AbsoluteUri.Replace(context.Request.Url.AbsolutePath, string.Empty);
+            string publicAddress = string.IsNullOrEmpty(Config.CustomDomain)
+                ? context.Request.Url.AbsoluteUri.Replace(context.Request.Url.AbsolutePath, string.Empty)
+                : Config.CustomDomain;
 
             List<HDHomeRunLineupItem> lineupItems = new List<HDHomeRunLineupItem>();
 
