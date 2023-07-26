@@ -128,7 +128,7 @@ namespace twitch2tuner
                 StreamUtility streamDiscoveryUtility = Config.StreamUtility;
                 $"Using {streamDiscoveryUtility.Name} for stream discovery.".Log(nameof(GetStream), LogLevel.Info);
 
-                // At this time, only yt-dlp (youtube-dl) (ffmpeg under the hood) can do the actual streaming for Plex.
+                // At this time, only yt-dlp (ffmpeg under the hood) can do the actual streaming for Plex.
                 StreamUtility streamPlayingUtility = Config.StreamUtility; // Instead of Config.StreamUtility
                 $"Using {streamPlayingUtility.Name} for stream playing.".Log(nameof(GetStream), LogLevel.Info);
 

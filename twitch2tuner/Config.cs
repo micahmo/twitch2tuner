@@ -23,7 +23,6 @@ namespace twitch2tuner
 
         public static StreamUtility StreamUtility => Environment.GetEnvironmentVariable("STREAM_UTILITY") switch
         {
-            "YOUTUBE_DL" => YoutubeDl.Instance,
             "YT_DLP" => YoutubeDl.Instance,
             "STREAMLINK" => Streamlink.Instance,
             _ => Streamlink.Instance,
