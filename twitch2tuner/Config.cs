@@ -24,6 +24,7 @@ namespace twitch2tuner
         public static StreamUtility StreamUtility => Environment.GetEnvironmentVariable("STREAM_UTILITY") switch
         {
             "YOUTUBE_DL" => YoutubeDl.Instance,
+            "YT_DLP" => YoutubeDl.Instance,
             "STREAMLINK" => Streamlink.Instance,
             _ => Streamlink.Instance,
         };
@@ -74,7 +75,7 @@ namespace twitch2tuner
                 // This is a hack to wait for logging to be flushed since it is totally asynchronous.
                 // See https://github.com/unosquare/swan/issues/221
                 Thread.Sleep(TimeSpan.FromSeconds(1));
-                
+
                 Environment.Exit(1);
             }
 

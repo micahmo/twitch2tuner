@@ -132,7 +132,7 @@ I've found that the guide often does not load correctly the first time on Roku d
 
 # Contributing
 
-While anyone is free to open new issues, be aware that there is a limit to the level of compatibility that this project will ever have, since it is essentially fitting a square peg in a round hole. In addition, much of the functionality is outside the control of this project (e.g., the Twitch API, Streamlink, youtube-dl, Plex, etc.). There is no guarantee that any particular issue or quirk can be addressed. That said, contributions are more than welcome where appropriate.
+While anyone is free to open new issues, be aware that there is a limit to the level of compatibility that this project will ever have, since it is essentially fitting a square peg in a round hole. In addition, much of the functionality is outside the control of this project (e.g., the Twitch API, Streamlink, yt-dlp, youtube-dl, Plex, etc.). There is no guarantee that any particular issue or quirk can be addressed. That said, contributions are more than welcome where appropriate.
 
 # Credits
 
@@ -143,6 +143,7 @@ Thanks to the following projects which provided inspiration for this project.
 Special credit to [IPTVTuner](https://github.com/marklieberman/iptvtuner) as a guide for emulating an HDHomeRun tuner.
 
 Thanks to the following utilities which make it possible to stream from Twitch.
+* [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 * [youtube-dl](https://github.com/ytdl-org/youtube-dl)
 * [Streamlink](https://github.com/streamlink/streamlink)
 
