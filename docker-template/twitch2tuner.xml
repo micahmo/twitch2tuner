@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Container>
-  <TemplateURL>https://raw.githubusercontent.com/micahmo/twitch2tuner/master/docker-template/twitch2tuner.xml</TemplateURL>
+  <TemplateURL>
+    https://raw.githubusercontent.com/micahmo/twitch2tuner/master/docker-template/twitch2tuner.xml</TemplateURL>
   <Name>twitch2tuner</Name>
   <Project>https://github.com/micahmo/twitch2tuner/</Project>
   <Overview>
@@ -12,14 +13,25 @@
   <Registry>https://github.com/micahmo/twitch2tuner/pkgs/container/twitch2tuner</Registry>
   <GitHub>https://github.com/micahmo/twitch2tuner/</GitHub>
   <Repository>ghcr.io/micahmo/twitch2tuner</Repository>
-  <!-- Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com -->
+  <!-- Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a
+  href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com -->
   <Icon>https://raw.githubusercontent.com/micahmo/twitch2tuner/master/twitch2tuner-icon.png</Icon>
   <Networking>
     <Mode>bridge</Mode>
   </Networking>
-  <Config Name="Client ID" Target="CLIENT_ID" Default="" Mode="" Description="The ID of the client to access the Twitch API" Type="Variable" Display="always" Required="true" Mask="false"></Config>
-  <Config Name="Client Secret" Target="CLIENT_SECRET" Default="" Mode="" Description="The secret of the client to access the Twitch API" Type="Variable" Display="always" Required="true" Mask="false"></Config>
-  <Config Name="Username" Target="TWITCH_USERNAME" Default="" Mode="" Description="The username of the user whose followed channels should be loaded" Type="Variable" Display="always" Required="true" Mask="false"></Config>
-  <Config Name="Stream Utility" Target="STREAM_UTILITY" Default="STREAMLINK" Mode="" Description="The name of the utility for extracting stream URLs (either YOUTUBE_DL or STREAMLINK)." Type="Variable" Display="always" Required="true" Mask="false"></Config>
-  <Config Name="Port" Target="22708" Default="22708" Mode="tcp" Description="The external port to reach this service. Maps to container port 22708." Type="Port" Display="always" Required="true" Mask="false">22708</Config>
+  <Config Name="Client ID" Target="CLIENT_ID" Default="" Mode=""
+    Description="The ID of the client to access the Twitch API" Type="Variable" Display="always"
+    Required="true" Mask="false"></Config>
+  <Config Name="Client Secret" Target="CLIENT_SECRET" Default="" Mode=""
+    Description="The secret of the client to access the Twitch API" Type="Variable" Display="always"
+    Required="true" Mask="false"></Config>
+  <Config Name="Username" Target="TWITCH_USERNAME" Default="" Mode=""
+    Description="The username of the user whose followed channels should be loaded" Type="Variable"
+    Display="always" Required="true" Mask="false"></Config>
+  <Config Name="Stream Utility" Target="STREAM_UTILITY" Default="STREAMLINK" Mode=""
+    Description="The name of the utility for extracting stream URLs (either YT_DLP or STREAMLINK)."
+    Type="Variable" Display="always" Required="true" Mask="false"></Config>
+  <Config Name="Port" Target="22708" Default="22708" Mode="tcp"
+    Description="The external port to reach this service. Maps to container port 22708." Type="Port"
+    Display="always" Required="true" Mask="false">22708</Config>
 </Container>

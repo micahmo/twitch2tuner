@@ -87,7 +87,7 @@ namespace twitch2tuner
                     Id = channel.DisplayName,
                     Lcn = channel.ChannelNumber,
                     DisplayName = channel.DisplayName,
-                    Icon = new Icon {Source = channel.ProfileImageUrl}
+                    Icon = new Icon { Source = channel.ProfileImageUrl }
                 });
 
                 string liveTitle = $"{(char)8226} {{0}} Playing {{1}}"; // 8226 is https://bytetool.web.app/en/ascii/code/0x95/
@@ -125,11 +125,11 @@ namespace twitch2tuner
                 await ChannelManager.UpdateLiveStatus(channel);
 
                 // Grab the stream utility right off the bat, on the off chance that the env var changes.
-                StreamUtility streamDiscoveryUtility = Config.StreamUtility;
+                StreamUtility streamDiscoveryUtility = Config.DiscoverUtility;
                 $"Using {streamDiscoveryUtility.Name} for stream discovery.".Log(nameof(GetStream), LogLevel.Info);
 
-                // At this time, only youtube-dl (ffmpeg under the hood) can do the actual streaming for Plex.
-                StreamUtility streamPlayingUtility = YoutubeDl.Instance; // Instead of Config.StreamUtility
+                // At this time, only yt-dlp (ffmpeg under the hood) can do the actual streaming for Plex.
+                StreamUtility streamPlayingUtility = Config.StreamUtility; // Instead of Config.StreamUtility
                 $"Using {streamPlayingUtility.Name} for stream playing.".Log(nameof(GetStream), LogLevel.Info);
 
                 if (channel.IsLive)
