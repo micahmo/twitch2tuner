@@ -23,7 +23,14 @@ namespace twitch2tuner
 
         public static StreamUtility StreamUtility => Environment.GetEnvironmentVariable("STREAM_UTILITY") switch
         {
-            "YT_DLP" => YoutubeDl.Instance,
+            "YT_DLP" => YtDlp.Instance,
+            "STREAMLINK" => Streamlink.Instance,
+            _ => YtDlp.Instance,
+        };
+
+        public static StreamUtility DiscoverUtility => Environment.GetEnvironmentVariable("DISCOVER_UTILITY") switch
+        {
+            "YT_DLP" => YtDlp.Instance,
             "STREAMLINK" => Streamlink.Instance,
             _ => Streamlink.Instance,
         };
@@ -80,5 +87,9 @@ namespace twitch2tuner
 
             return result;
         }
+    }
+
+    public class DiscoverUtility
+    {
     }
 }

@@ -38,7 +38,7 @@ namespace twitch2tuner
         }
     }
 
-    public class YoutubeDl : StreamUtility
+    public class YtDlp : StreamUtility
     {
         /// <inheritdoc/>
         public override string Name => "yt-dlp";
@@ -53,11 +53,11 @@ namespace twitch2tuner
         /// <inheritdoc/>
         public override Process StartStreamProcess(string streamUrl)
         {
-            Process youtubeDlProcess = base.StartProcess("yt-dlp", $"-q --no-warnings {streamUrl} --add-header \"X-Device-Id: twitch-web-wall-mason\" --add-header \"Device-ID: twitch-web-wall-mason\" --downloader ffmpeg -o -");
-            return youtubeDlProcess;
+            Process ytDlpProcess = base.StartProcess("yt-dlp", $"-q --no-warnings {streamUrl} --add-header \"X-Device-Id: twitch-web-wall-mason\" --add-header \"Device-ID: twitch-web-wall-mason\" --downloader ffmpeg -o -");
+            return ytDlpProcess;
         }
 
-        public static StreamUtility Instance { get; set; } = new YoutubeDl();
+        public static StreamUtility Instance { get; set; } = new YtDlp();
     }
 
     public class Streamlink : StreamUtility

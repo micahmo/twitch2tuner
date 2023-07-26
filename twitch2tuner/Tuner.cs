@@ -125,7 +125,7 @@ namespace twitch2tuner
                 await ChannelManager.UpdateLiveStatus(channel);
 
                 // Grab the stream utility right off the bat, on the off chance that the env var changes.
-                StreamUtility streamDiscoveryUtility = Config.StreamUtility;
+                StreamUtility streamDiscoveryUtility = Config.DiscoverUtility;
                 $"Using {streamDiscoveryUtility.Name} for stream discovery.".Log(nameof(GetStream), LogLevel.Info);
 
                 // At this time, only yt-dlp (ffmpeg under the hood) can do the actual streaming for Plex.
