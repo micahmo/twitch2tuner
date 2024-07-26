@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Swan.Logging;
 
 namespace twitch2tuner
@@ -21,9 +22,12 @@ namespace twitch2tuner
         /// </summary>
         public abstract Process StartStreamProcess(string streamUrl);
 
-        protected virtual Process StartProcess(string filename, string arguments)
+        protected virtual Process StartProcess(string filename, string arguments, bool log = true)
         {
-            $"Executing: {filename} {arguments}".Log(GetType().Name, LogLevel.Info);
+            if (log)
+            {
+                $"Executing: {filename} {arguments}".Log(GetType().Name, LogLevel.Info);
+            }
 
             Process process = Process.Start(new ProcessStartInfo
             {
@@ -36,6 +40,18 @@ namespace twitch2tuner
 
             return process;
         }
+
+        protected virtual Process StartProcess(string filename, params StreamUtilityArgument[] arguments)
+        {
+            $"Executing: {filename} {string.Join(" ", arguments.Where(arg => arg.IsValid).Select(arg => arg.LogInstead ?? arg.Argument))}".Log(GetType().Name, LogLevel.Info);
+
+            return StartProcess(filename, string.Join(" ", arguments.Where(arg => arg.IsValid).Select(arg => arg.Argument)), log: false);
+        }
+    }
+
+    public record StreamUtilityArgument(string Argument, string LogInstead = null)
+    {
+        public bool IsValid => !string.IsNullOrEmpty(Argument);
     }
 
     public class YoutubeDl : StreamUtility
@@ -68,7 +84,13 @@ namespace twitch2tuner
         /// <inheritdoc/>
         public override string GetStreamUrl(string channelUrl)
         {
-            Process getStreamUrlProcess = base.StartProcess("streamlink", $"{channelUrl} best --quiet --stream-url");
+            string authorizationHeader = string.IsNullOrEmpty(Config.OauthToken) ? string.Empty : $"\"--http-header=Authorization=OAuth {Config.OauthToken}\"";
+            Process getStreamUrlProcess = base.StartProcess("streamlink",
+                new StreamUtilityArgument(channelUrl),
+                new StreamUtilityArgument("best"),
+                new StreamUtilityArgument(authorizationHeader, LogInstead: "[OAuth Token Redacted]"),
+                new StreamUtilityArgument("--stream-url"),
+                new StreamUtilityArgument("--twitch-disable-ads"));
             return getStreamUrlProcess.StandardOutput.ReadToEnd();
         }
 

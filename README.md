@@ -92,6 +92,10 @@ docker run -d --name=twitch2tuner -p 22708:22708 -e CLIENT_ID=... -e CLIENT_SECR
   -e USE_PROFILE_AS_JUST_CHATTING=true
   ```
 
+* `OAUTH_TOKEN`
+
+  You can optionally pass a value for the `OAUTH_TOKEN` environment variable. When this is set, it will be passed via the `--http-header` argument to `streamlink`. This may help to avoid ads in streams when you are a Twitch Turbo member or a channel subscriber. Please follow the instructions on the [Streamlink documentation page](https://streamlink.github.io/cli/plugins/twitch.html) for how to obtain the token.
+
 ### Unraid
 
 To run the container on Unraid, you can use the Docker template from this repository.
@@ -105,7 +109,7 @@ Once the container is up and running, you can add the server as a Live TV and DV
 
 In Plex, go to Settings > Live TV & DVR > Set Up Plex DVR.
 
-If the server is not found automatically, click "Don't see your HDHomeRun device? Enter its network address manually" and enter the address and port that the server is running on, like `http://192.168.1.2:22708`. Click Connect. You should see that it has discovered a number of channels equaling the number of Twitch channels that are followed by the configured user.
+If the server is not found automatically, click "Don't see your HDHomeRun device? Enter its network address manually" and enter the address and port that the server is running on, like `http://192.168.1.2:22708`. Click Connect. You should see that it has discovered a number of channels equaling the number of Twitch channels that are followed by the configured user. (If it says 0 channels, make sure that twitch2tuner was able to successfully load your followed channels using the guidance above. You may also need to close and re-open the Tuner Setup in Plex.)
 
 Before allowing you to continue, Plex wants to discover the guide. There is a prompt to enter a ZIP code, but the Twitch guide is served by twitch2tuner, so click "Have an XMLTV guide on your server? Click here to use that instead." Then enter the address of the server, followed by `/epg.xml`, like `http://192.168.1.2:22708/epg.xml`. You may enter anything for the Guide Title. Click Continue.
 
@@ -124,7 +128,7 @@ This is an imperfect solution, as Twitch is obviously not designed to be served 
  - This project is very much untested with regards to Plex's DVR feature. As with any project that is piecing together things that were not intended to work together, YMMV!
     - While DVR has has not been thoroughly tested, one thing that does work nicely is pausing and/or rewinding live streams.
  - While the ability to pause and rewind a live stream is nice, there is a small quirk where the stream will end immediately when the streamer goes offline even if you are not at the end. (In other words, it will not play till the end of the stream if you are watching behind live.) 
- - Playback does not seem to work in the Windows desktop app. It has been tested and works on Roku, Android, and in the Chrome web player.
+ - Playback does not seem to work in the Windows desktop app. It has been tested and works on Roku, Android, and in the web player (Chrome and Firefox).
 
 # Misc
 

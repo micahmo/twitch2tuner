@@ -42,6 +42,8 @@ namespace twitch2tuner
 
         public static string RedirectUri => string.IsNullOrEmpty(CustomDomain) ? "https://google.com" : $"{CustomDomain}/redirect";
 
+        public static string OauthToken => Environment.GetEnvironmentVariable("OAUTH_TOKEN");
+
         /// <summary>
         /// Verifies that all required configuration values are available
         /// </summary>
