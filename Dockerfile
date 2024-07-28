@@ -17,11 +17,12 @@ RUN dotnet publish "twitch2tuner.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY streamlink $HOME/.config/streamlink
 
 RUN apt-get update && apt-get install -y \
-  # Install pip so that we can use pip to install youtube-dl and streamlink at runtime
+  # Install pip so that we can use pip to install yt-dlp and streamlink at runtime
   python3-pip \
-  # youtube-dl needs ffmpeg, but it can't be installed with pip
+  # yt-dlp needs ffmpeg, but it can't be installed with pip
   ffmpeg \
   && rm -rf /var/lib/apt/lists/*
 

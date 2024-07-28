@@ -1,0 +1,15 @@
+twitch-disable-ads
+twitch-low-latency
+twitch-api-header Device-ID=twitch-web-wall-mason
+twitch-api-header X-Device-Id=twitch-web-wall-mason
+
+hls-live-edge=2
+hls-segment-threads=4
+hls-segment-stream-data
+stream-segment-threads=4
+
+retry-streams 10
+retry-max 100
+retry-open 10
+
+default-stream "best,720p,480p,worst"
