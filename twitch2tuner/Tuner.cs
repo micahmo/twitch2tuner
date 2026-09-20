@@ -129,7 +129,7 @@ namespace twitch2tuner
                 $"Using {streamDiscoveryUtility.Name} for stream discovery.".Log(nameof(GetStream), LogLevel.Info);
 
                 // At this time, only youtube-dl (ffmpeg under the hood) can do the actual streaming for Plex.
-                StreamUtility streamPlayingUtility = YoutubeDl.Instance; // Instead of Config.StreamUtility
+                StreamUtility streamPlayingUtility = YtDlp.Instance; // Instead of Config.StreamUtility
                 $"Using {streamPlayingUtility.Name} for stream playing.".Log(nameof(GetStream), LogLevel.Info);
 
                 if (channel.IsLive)

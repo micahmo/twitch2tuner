@@ -68,7 +68,7 @@ namespace twitch2tuner
             // If the user is streaming, get the game art
             if (stream is { })
             {
-                var game = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Games.GetGamesAsync(new List<string> {stream.GameId}), nameof(TwitchAPI.Helix.Games.GetGamesAsync)))?.Games.FirstOrDefault();
+                var game = (await TwitchApiManager.UseTwitchApi(twitchApi => twitchApi.Helix.Games.GetGamesAsync(new List<string> {stream.GameId}), nameof(TwitchAPI.Helix.Games.GetGamesAsync)))?.Data.FirstOrDefault();
                 channel.LiveGameArtUrl = game?.BoxArtUrl.Replace("{width}", "272").Replace("{height}", "380");
             }
         }

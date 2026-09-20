@@ -20,7 +20,7 @@ namespace twitch2tuner
             var pipProcess = Process.Start(new ProcessStartInfo
             {
                 FileName = "pip3",
-                Arguments = "install --upgrade youtube-dl streamlink",
+                Arguments = "install --upgrade yt-dlp streamlink",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true

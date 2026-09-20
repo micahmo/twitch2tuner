@@ -116,7 +116,7 @@ namespace twitch2tuner
 
         public static Task AuthorizeUser(IHttpContext httpContext)
         {
-            string authorizationUrl = TwitchApi.Auth.GetAuthorizationCodeUrl(Config.RedirectUri, new List<AuthScopes> { AuthScopes.Helix_User_Read_Follows });
+            string authorizationUrl = TwitchApi.Auth.GetAuthorizationCodeUrl(Config.RedirectUri, new List<AuthScopes> { AuthScopes.User_Read_Follows });
 
             $"Redirecting user to authorization code flow URL: {authorizationUrl}".Log(nameof(AuthorizeUser), LogLevel.Info);
 

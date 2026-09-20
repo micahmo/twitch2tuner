@@ -78,11 +78,17 @@ docker run -d --name=twitch2tuner -p 22708:22708 -e CLIENT_ID=... -e CLIENT_SECR
 
   You can optionally pass a value for the `STREAM_UTILITY` environment variable. The accepted values are `YOUTBUE_DL` and `STREAMLINK` with any other value (or empty) defaulting to `STREAMLINK`. This determines the utility that is used to extract the stream URL from Twitch. This is configurable because occasionally the URLs from one utility or the other begin with an ad placeholder embedded at the beginning of the stream. (Fortunately, there is no ad, but it is annoying to wait for the placeholder to count down.) I've had more luck with the URLs obtained by Streamlink, which is why it is the default, but you can experiment to find the best for you.
   ```
-  -e STREAM_UTILITY=YOUTUBE_DL
+  -e STREAM_UTILITY=YT_DLP
   ```
 
    If you'd like to locally test the exact command that is run for a given utility, see the code [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L71) and [here](https://github.com/micahmo/twitch2tuner/blob/cf30f3e12c4906e7e0eb422cf86e9acef384d52a/twitch2tuner/StreamUtility.cs#L49).
 
+* `STREAMLINK_QUALITY`
+
+  You can optionally pass a value for the `STREAMLINK_QUALITY` environment variable. When using the STREAMLINK stream utility, it will use the quality specified here first, or default to "best" if not found. This is configurable because sometimes you don't want to grab the 1440p stream if you only have a 1080p display. The format specifications can be found [here](https://streamlink.github.io/cli.html#cmdoption-arg-STREAM). 
+  ```
+  -e STREAMLINK_QUALITY="1080p,best"
+  ```
 
 * `USE_PROFILE_AS_JUST_CHATTING`
 
@@ -147,7 +153,7 @@ Thanks to the following projects which provided inspiration for this project.
 Special credit to [IPTVTuner](https://github.com/marklieberman/iptvtuner) as a guide for emulating an HDHomeRun tuner.
 
 Thanks to the following utilities which make it possible to stream from Twitch.
-* [youtube-dl](https://github.com/ytdl-org/youtube-dl)
+* [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 * [Streamlink](https://github.com/streamlink/streamlink)
 
 [Icon](https://www.flaticon.com/free-icon/twitch_3845873) made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com.
