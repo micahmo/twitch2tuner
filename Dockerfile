@@ -6,7 +6,6 @@ COPY ["twitch2tuner/twitch2tuner.csproj", "twitch2tuner/"]
 RUN dotnet restore "twitch2tuner/twitch2tuner.csproj"
 COPY . .
 WORKDIR "/src/twitch2tuner"
-#RUN dotnet build "twitch2tuner.csproj" -c Release -o /app/build
 RUN dotnet publish "twitch2tuner.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/runtime:10.0 AS final

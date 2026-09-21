@@ -93,7 +93,6 @@ namespace twitch2tuner
                 new StreamUtilityArgument(authorizationHeader, LogInstead: "[OAuth Token Redacted]"),
                 new StreamUtilityArgument("--stream-url"),
                 new StreamUtilityArgument("--twitch-disable-ads"),
-                new StreamUtilityArgument("--twitch-low-latency"),
             ];
 
             Process getStreamUrlProcess = base.StartProcess("streamlink", arguments.ToArray());

@@ -24,11 +24,12 @@ namespace twitch2tuner
         public static StreamUtility StreamUtility => Environment.GetEnvironmentVariable("STREAM_UTILITY") switch
         {
             "YT_DLP" => YtDlp.Instance,
+            "YOUTUBE_DL" => YtDlp.Instance,
             "STREAMLINK" => Streamlink.Instance,
             _ => Streamlink.Instance,
         };
 
-        public static string StreamLinkQuality => Environment.GetEnvironmentVariable("STREAMLINK_QUALITY");
+        public static string StreamLinkQuality => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("STREAMLINK_QUALITY")) ? null : Environment.GetEnvironmentVariable("STREAMLINK_QUALITY");
 
         public static bool UseProfileAsJustChatting =>
             bool.TryParse(Environment.GetEnvironmentVariable("USE_PROFILE_AS_JUST_CHATTING"), out bool useProfileAsJustChatting)
