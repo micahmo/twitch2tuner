@@ -113,11 +113,11 @@ To run the container on Unraid, you can use the Docker template from this reposi
 
 Once the container is up and running, you can add the server as a Live TV and DVR in Plex.
 
-In Plex, go to Settings > Live TV & DVR > Set Up Plex DVR.
+In Plex, go to Settings > Live TV & DVR > Set Up Plex Tuner.
 
 If the server is not found automatically, click "Don't see your HDHomeRun device? Enter its network address manually" and enter the address and port that the server is running on, like `http://192.168.1.2:22708`. Click Connect. You should see that it has discovered a number of channels equaling the number of Twitch channels that are followed by the configured user. (If it says 0 channels, make sure that twitch2tuner was able to successfully load your followed channels using the guidance above. You may also need to close and re-open the Tuner Setup in Plex.)
 
-Before allowing you to continue, Plex wants to discover the guide. There is a prompt to enter a ZIP code, but the Twitch guide is served by twitch2tuner, so click "Have an XMLTV guide on your server? Click here to use that instead." Then enter the address of the server, followed by `/epg.xml`, like `http://192.168.1.2:22708/epg.xml`. You may enter anything for the Guide Title. Click Continue.
+Press "Setup Device". Before allowing you to continue, Plex wants to discover the guide. There is a prompt to enter a ZIP code, but the Twitch guide is served by twitch2tuner, so click "Have an XMLTV guide on your server? Click here to use that instead." Then enter the address of the server, followed by `/epg.xml`, like `http://192.168.1.2:22708/epg.xml`. You may enter anything for the Guide Title. Click Continue.
 
 Plex should load the Electronic Program Guide and match the listings to the channel lineup from the tuner. Click Continue.
 
